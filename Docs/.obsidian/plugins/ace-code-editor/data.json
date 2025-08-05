@@ -1,0 +1,20 @@
+{
+  "supportExtensions": [
+    "js"
+  ],
+  "lightTheme": "chrome",
+  "darkTheme": "monokai",
+  "keyboard": "default",
+  "lineNumbers": true,
+  "fontSize": 14,
+  "fontFamily": [
+    "Consolas",
+    "Courier New",
+    "monospace"
+  ],
+  "tabSize": 4,
+  "snippetsManager": {
+    "location": false,
+    "icon": "code"
+  }
+}
