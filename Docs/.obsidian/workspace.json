@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "985ce7cd4eba3f58",
+        "id": "72481c4fab54dc70",
         "type": "tabs",
         "children": [
           {
-            "id": "f94c6d61613941ed",
+            "id": "c6d45c7eabb31c4b",
             "type": "leaf",
             "state": {
               "type": "split-diff-view",
               "state": {
-                "aFile": "Docs/.obsidian/workspace.json",
-                "bFile": "Docs/.obsidian/workspace.json",
+                "aFile": "Docs/.obsidian/plugins/colored-tags/data.json",
+                "bFile": "Docs/.obsidian/plugins/colored-tags/data.json",
                 "aRef": ""
               },
               "icon": "diff",
-              "title": "Diff: workspace.json"
+              "title": "Diff: data.json"
             }
           }
         ]
@@ -64,7 +64,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#excalidraw",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -216,12 +216,15 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "f94c6d61613941ed",
+  "active": "c6d45c7eabb31c4b",
   "lastOpenFiles": [
+    "Ютілки/Логер.md",
+    "Excalidraw/Workflow.md",
+    "Ютілки",
+    "Excalidraw",
     "Test doc.md",
     "Excalidraw/Drawing 2025-08-06 00.45.08.excalidraw.md",
     "Untitled Diagram.svg",
-    "Excalidraw",
     "Untitled Kanban.md",
     "Excalidraw/Drawing 2025-08-06 00.37.53.excalidraw.md",
     "Excalidraw/Drawing 2025-08-06 00.36.23.excalidraw.md",

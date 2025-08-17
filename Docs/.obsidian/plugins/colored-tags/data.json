@@ -10,7 +10,8 @@
     "highTextContrast": false
   },
   "knownTags": {
-    "excalidraw": 1
+    "excalidraw": 1,
+    "utils": 2
   },
   "_version": 3
 }
