@@ -1,80 +1,85 @@
 using System.Collections.Generic;
 
+using Assets.Scripts;
+using Assets.Scripts.Enums;
+
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
 public class ImageTrackingManager : MonoBehaviour
 {
-    [SerializeField] private List<GameObject> _prefabs = new List<GameObject>();
+	[SerializeField] private List<GameObject> _prefabs = new List<GameObject>();
 
-    private ARTrackedImageManager _arManager;
-    private Dictionary<string, GameObject> _arObjects;
+	private ARTrackedImageManager _arManager;
+	private Dictionary<string, GameObject> _arObjects;
 
-    private void Start()
-    {
-        _arObjects = new Dictionary<string, GameObject>();
-        _arManager = GetComponent<ARTrackedImageManager>();
+	private void Start()
+	{
+		_arObjects = new Dictionary<string, GameObject>();
+		_arManager = GetComponent<ARTrackedImageManager>();
 
-        if (_arManager != null)
-        {
-            _arManager.trackablesChanged.AddListener(OnImagesTrackedChanged);
-            UploadArObjects();
-        }
-    }
+		if (_arManager != null)
+		{
+			_arManager.trackablesChanged.AddListener(OnImagesTrackedChanged);
+			UploadArObjects();
+		}
 
-    private void OnDestroy()
-    {
-        _arManager.trackablesChanged.RemoveListener(OnImagesTrackedChanged);
-    }
+		CompositionRoot.Logger.WriteLogs(("AR pakets initialized successfully!", LogLevel.Debug), ("Second Log", LogLevel.Warning));
+	}
 
-    private void UploadArObjects()
-    {
-        foreach (var prefab in _prefabs)    
-        {
-            var arObject = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+	private void OnDestroy()
+	{
+		_arManager.trackablesChanged.RemoveListener(OnImagesTrackedChanged);
+	}
 
-            arObject.name = prefab.name;
-            arObject.gameObject.SetActive(false);
-            _arObjects.TryAdd(arObject.name, arObject);
-        }
-    }
+	private void UploadArObjects()
+	{
+		foreach (var prefab in _prefabs)
+		{
+			var arObject = Instantiate(prefab, Vector3.zero, Quaternion.identity);
 
-    private void OnImagesTrackedChanged(ARTrackablesChangedEventArgs<ARTrackedImage> eventArgs)
-    {
-        foreach (var item in eventArgs.added)
-        {
-            UpdateTrackedImage(item);
-        }
+			arObject.name = prefab.name;
+			arObject.gameObject.SetActive(false);
+			_arObjects.TryAdd(arObject.name, arObject);
+		}
+	}
 
-        foreach (var item in eventArgs.updated)
-        {
-            UpdateTrackedImage(item);
-        }
+	private void OnImagesTrackedChanged(ARTrackablesChangedEventArgs<ARTrackedImage> eventArgs)
+	{
+		foreach (var item in eventArgs.added)
+		{
+			UpdateTrackedImage(item);
+		}
 
-        foreach (var item in eventArgs.removed)
-        {
-            UpdateTrackedImage(item.Value);
-        }
-    }
+		foreach (var item in eventArgs.updated)
+		{
+			UpdateTrackedImage(item);
+		}
 
-    private void UpdateTrackedImage(ARTrackedImage image)
-    {
-        if (image == null)
-        {
-            return;
-        }
+		foreach (var item in eventArgs.removed)
+		{
+			UpdateTrackedImage(item.Value);
+		}
+	}
 
-        if (image.trackingState == TrackingState.Limited ||
-            image.trackingState == TrackingState.None)
-        {
-            _arObjects[image.referenceImage.name].gameObject.SetActive(false);
+	private void UpdateTrackedImage(ARTrackedImage image)
+	{
+		if (image == null)
+		{
+			return;
+		}
 
-            return;
-        }
+		if (image.trackingState == TrackingState.Limited ||
+			image.trackingState == TrackingState.None)
+		{
+			_arObjects[image.referenceImage.name].gameObject.SetActive(false);
 
-        _arObjects[image.referenceImage.name].gameObject.SetActive(true);
-        _arObjects[image.referenceImage.name].transform.position = image.transform.position;
-        _arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
-    }
+			return;
+		}
+
+		_arObjects[image.referenceImage.name].gameObject.SetActive(true);
+		_arObjects[image.referenceImage.name].transform.position = image.transform.position;
+		_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
+	}
 }
