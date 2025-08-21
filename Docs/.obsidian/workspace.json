@@ -18,8 +18,23 @@
               "icon": "excalidraw-icon",
               "title": "Workflow"
             }
+          },
+          {
+            "id": "8782aab75f62c54d",
+            "type": "leaf",
+            "state": {
+              "type": "split-diff-view",
+              "state": {
+                "aFile": "Docs/.obsidian/core-plugins.json",
+                "bFile": "Docs/.obsidian/core-plugins.json",
+                "aRef": ""
+              },
+              "icon": "diff",
+              "title": "Diff: core-plugins.json"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -157,12 +172,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "Excalidraw/Workflow.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Вміст"
+              "title": "Вміст Workflow"
             }
           },
           {
@@ -201,6 +217,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "bases:Create new base": false,
       "switcher:Відкрити провідник файлів": false,
       "canvas:Створити нове полотно": false,
       "daily-notes:Сьогоднішня нотатка": false,
@@ -214,7 +231,7 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "24da40e42c14fa6d",
+  "active": "8782aab75f62c54d",
   "lastOpenFiles": [
     "Основний workflow/DbManager.md",
     "Excalidraw/Workflow.md",
