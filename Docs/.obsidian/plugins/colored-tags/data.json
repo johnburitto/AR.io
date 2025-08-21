@@ -11,7 +11,8 @@
   },
   "knownTags": {
     "excalidraw": 1,
-    "utils": 2
+    "utils": 2,
+    "main_workflow": 3
   },
   "_version": 3
 }

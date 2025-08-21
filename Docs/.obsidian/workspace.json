@@ -4,21 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "72481c4fab54dc70",
+        "id": "94b85c73b89b4987",
         "type": "tabs",
         "children": [
           {
-            "id": "c6d45c7eabb31c4b",
+            "id": "24da40e42c14fa6d",
             "type": "leaf",
             "state": {
-              "type": "split-diff-view",
+              "type": "excalidraw",
               "state": {
-                "aFile": "Docs/.obsidian/plugins/colored-tags/data.json",
-                "bFile": "Docs/.obsidian/plugins/colored-tags/data.json",
-                "aRef": ""
+                "file": "Excalidraw/Workflow.md"
               },
-              "icon": "diff",
-              "title": "Diff: data.json"
+              "icon": "excalidraw-icon",
+              "title": "Workflow"
             }
           }
         ]
@@ -216,10 +214,15 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "c6d45c7eabb31c4b",
+  "active": "24da40e42c14fa6d",
   "lastOpenFiles": [
-    "Ютілки/Логер.md",
+    "Основний workflow/DbManager.md",
     "Excalidraw/Workflow.md",
+    "sqlite-net-pcl.md",
+    "Основний workflow/AR-пакет.md",
+    "Ютілки/Логер.md",
+    "Основний workflow",
+    "Без назви.md",
     "Ютілки",
     "Excalidraw",
     "Test doc.md",
