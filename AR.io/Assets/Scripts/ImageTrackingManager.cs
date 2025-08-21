@@ -1,8 +1,5 @@
 using System.Collections.Generic;
 
-using Assets.Scripts;
-using Assets.Scripts.Enums;
-
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -24,8 +21,6 @@ public class ImageTrackingManager : MonoBehaviour
 			_arManager.trackablesChanged.AddListener(OnImagesTrackedChanged);
 			UploadArObjects();
 		}
-
-		CompositionRoot.Logger.WriteLogs(("AR pakets initialized successfully!", LogLevel.Debug), ("Second Log", LogLevel.Warning));
 	}
 
 	private void OnDestroy()
