@@ -18,23 +18,8 @@
               "icon": "excalidraw-icon",
               "title": "Workflow"
             }
-          },
-          {
-            "id": "8782aab75f62c54d",
-            "type": "leaf",
-            "state": {
-              "type": "split-diff-view",
-              "state": {
-                "aFile": "Docs/.obsidian/core-plugins.json",
-                "bFile": "Docs/.obsidian/core-plugins.json",
-                "aRef": ""
-              },
-              "icon": "diff",
-              "title": "Diff: core-plugins.json"
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -231,10 +216,11 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "8782aab75f62c54d",
+  "active": "24da40e42c14fa6d",
   "lastOpenFiles": [
-    "Основний workflow/DbManager.md",
+    "Основний workflow/Завантаження AR-пакетів.md",
     "Excalidraw/Workflow.md",
+    "Основний workflow/DbManager.md",
     "sqlite-net-pcl.md",
     "Основний workflow/AR-пакет.md",
     "Ютілки/Логер.md",
