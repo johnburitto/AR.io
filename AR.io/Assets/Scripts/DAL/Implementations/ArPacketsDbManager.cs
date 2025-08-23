@@ -12,9 +12,9 @@ using SQLite;
 namespace Assets.Scripts.DAL.Implementations
 {
 	/// <summary>
-	/// Realisation of <see cref="IDbManager{T}"/>.
+	/// Realisation of <see cref="IArPacketsDbManager"/>.
 	/// </summary>
-	public class ArPacketsDbManager : IDbManager<ArPacket>
+	public class ArPacketsDbManager : IArPacketsDbManager
 	{
 		#region Private Fields
 
@@ -57,6 +57,10 @@ namespace Assets.Scripts.DAL.Implementations
 		/// <inheritdoc/>
 		public ArPacket GetById(Guid id)
 			=> _db.Find<ArPacket>(id);
+
+		/// <inheritdoc/>
+		public List<ArPacket> GetEnabledArPackets()
+			=> _db.Table<ArPacket>().Where(entity => entity.IsEnabled).ToList();
 
 		/// <inheritdoc/>
 		public int Update(ArPacket entity)
