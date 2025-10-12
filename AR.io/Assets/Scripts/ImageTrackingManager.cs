@@ -14,12 +14,17 @@ using Assets.Scripts.DAL.Interfaces;
 using Assets.Scripts.FileManagement.Interfaces;
 
 using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
+using TMPro;
+using static Unity.VisualScripting.Member;
 
 public class ImageTrackingManager : MonoBehaviour
 {
 	#region Serializes Fields
 
 	[SerializeField] private List<GameObject> _prefabs = new();
+	[SerializeField] private List<Texture2D> _markers = new();
+	[SerializeField] private XRReferenceImageLibrary _library;
+	[SerializeField] private TextMeshProUGUI _debugInfo;
 
 	#endregion
 
@@ -27,10 +32,10 @@ public class ImageTrackingManager : MonoBehaviour
 
 	private ARTrackedImageManager _arManager;
 	private Dictionary<string, GameObject> _arObjects;
-	private IFileManager _fileManager;
+	//private IFileManager _fileManager;
 	private ILogger _logger;
-	private MutableRuntimeReferenceImageLibrary _mutableLibrary;
-	private IArPacketsDbManager _arPacketsDbManager;
+	//private IArPacketsDbManager _arPacketsDbManager;
+	private bool _load = true;
 
 	#endregion
 
@@ -38,14 +43,23 @@ public class ImageTrackingManager : MonoBehaviour
 
 	private async void Start()
 	{
-		_fileManager = CompositionRoot.FileManager;
-		_logger = CompositionRoot.Logger;
-		_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
+		_debugInfo.text = "Start";
+
+		//_fileManager = CompositionRoot.FileManager;
+		//_logger = CompositionRoot.Logger;
+		//_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
+
+		_debugInfo.text = "After logger";
 
 		_arObjects = new Dictionary<string, GameObject>();
 		_arManager = GetComponent<ARTrackedImageManager>();
 
-		await LoadMarkers();
+		_debugInfo.text = "Before runtime library";
+
+		_arManager.referenceLibrary = _arManager.CreateRuntimeLibrary();
+		_arManager.enabled = true;
+
+		_debugInfo.text = "After runtime library";
 
 		if (_arManager != null)
 		{
@@ -57,6 +71,22 @@ public class ImageTrackingManager : MonoBehaviour
 	private void OnDestroy()
 	{
 		_arManager.trackablesChanged.RemoveListener(OnImagesTrackedChanged);
+	}
+
+	private void Update()
+	{
+		Debug.Log(ARSession.state);
+
+		if (ARSession.state == ARSessionState.SessionTracking && _load)
+		{
+			_debugInfo.text = "Before markers loaded";
+
+			LoadMarkers();
+
+			_debugInfo.text = "After markers loaded";
+
+			_load = false;
+		}
 	}
 
 	private void UploadArObjects()
@@ -95,49 +125,74 @@ public class ImageTrackingManager : MonoBehaviour
 
 	private void UpdateTrackedImage(ARTrackedImage image)
 	{
+		_debugInfo.text = $"Hello. Images is: {image.ToString()}";
+
 		if (image == null)
 		{
 			return;
 		}
 
-		if (image.trackingState == TrackingState.Limited ||
-			image.trackingState == TrackingState.None)
-		{
-			_arObjects[image.referenceImage.name].gameObject.SetActive(false);
+		_debugInfo.text = $"Reference image name: {image.referenceImage.name}\n" +
+			$"Image size: {image.referenceImage.size}";
 
-			return;
-		}
+		//if (image.trackingState == TrackingState.Limited ||
+		//	image.trackingState == TrackingState.None)
+		//{
+		//	_arObjects[image.referenceImage.name].gameObject.SetActive(false);
 
-		_arObjects[image.referenceImage.name].gameObject.SetActive(true);
-		_arObjects[image.referenceImage.name].transform.position = image.transform.position;
-		_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
+		//	return;
+		//}
+
+		//_arObjects[image.referenceImage.name].gameObject.SetActive(true);
+		//_arObjects[image.referenceImage.name].transform.position = image.transform.position;
+		//_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
 	}
 
-	private async Task LoadMarkers()
+	private void LoadMarkers()
 	{
-		var arPackets = _arPacketsDbManager.GetEnabledArPackets();
+		_debugInfo.text = "Get data from db";
+
+		//var arPackets = _arPacketsDbManager.GetEnabledArPackets();
 		var runtimeLibrary = _arManager.referenceLibrary as MutableRuntimeReferenceImageLibrary;
 
-		foreach (var packet in arPackets)
-		{
-			await ScheduleMarkers($"{packet.Name}/Markers", runtimeLibrary);
-		}
+		ScheduleMarkers("", runtimeLibrary);
 
-		_logger.WriteLog($"{runtimeLibrary.count}");
+		Debug.Log($"{runtimeLibrary.count}");
 		_arManager.referenceLibrary = runtimeLibrary;
 	}
 
-	private async Task ScheduleMarkers(string path, MutableRuntimeReferenceImageLibrary runtimeLibrary)
+	private void ScheduleMarkers(string path, MutableRuntimeReferenceImageLibrary runtimeLibrary)
 	{
-		var filePathes = _fileManager.GetMarkerNames("Test/Markers");
-		var markers = await _fileManager.GetMarkers(filePathes);
+		_debugInfo.text = "Start to get markers";
 
-		foreach (var marker in markers.Select((value, i) => new { i, value }))
+		//var filePathes = _fileManager.GetMarkerNames("Test/Markers");
+		//var markers = await _fileManager.GetMarkers(filePathes);
+
+		_debugInfo.text = "Start to upload markers";
+
+		foreach (var marker in _markers)
 		{
-			var job = runtimeLibrary.ScheduleAddImageWithValidationJob(marker.value, Path.GetFileNameWithoutExtension(filePathes[marker.i]), 0.1f);
+			RenderTexture rt = RenderTexture.GetTemporary(
+				marker.width,
+				marker.height,
+				0,
+				RenderTextureFormat.Default,
+				RenderTextureReadWrite.Linear);
+
+			Graphics.Blit(marker, rt);
+			RenderTexture previous = RenderTexture.active;
+			RenderTexture.active = rt;
+
+			Texture2D readableTexture = new Texture2D(marker.width, marker.height);
+			readableTexture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+			readableTexture.Apply();
+
+			var job = runtimeLibrary.ScheduleAddImageWithValidationJob(readableTexture, marker.name, 0.1f);
 
 			job.jobHandle.Complete();
 		}
+
+		_debugInfo.text = "Markers uploaded";
 	}
 
 	#endregion
