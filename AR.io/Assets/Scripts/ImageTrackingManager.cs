@@ -15,7 +15,6 @@ using Assets.Scripts.FileManagement.Interfaces;
 
 using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
 using TMPro;
-using static Unity.VisualScripting.Member;
 
 public class ImageTrackingManager : MonoBehaviour
 {

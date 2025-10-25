@@ -532,7 +532,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 602348615}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b96a37aa45266c4ca414232b7e54568, type: 3}
   m_Name: 
@@ -1149,8 +1149,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1425942150}
+  - component: {fileID: 1425942151}
   m_Layer: 0
-  m_Name: TestObject
+  m_Name: ObjectForTesting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1171,6 +1172,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1425942151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425942148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 968819ceede4e4c41b91f8577efd3968, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modelUrl: https://drive.google.com/file/d/1-8O87AtnUmIYGw7R6IGahitmJClnkyJn/view?usp=sharing
 --- !u!1 &1549189281
 GameObject:
   m_ObjectHideFlags: 0
