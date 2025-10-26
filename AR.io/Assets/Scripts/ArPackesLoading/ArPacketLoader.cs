@@ -12,52 +12,11 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 /// <summary>
-/// Emulate logic of ar packets loader.
+/// Ar Packets loader.
 /// </summary>
 public class ArPacketLoader : MonoBehaviour
 {
 	#region Private Fields
-
-	/// <summary>
-	/// Emulates Ar packet source.
-	/// </summary>
-	private ArPacketSource _arPacketSource = new()
-	{
-		Name = "Cars",
-		Elements = new()
-		{
-			new()
-			{
-				Name = "1983-toyota-sprinter-trueno-gt-apex-ae86",
-				MarkerUrl = "https://github.com/johnburitto/ARPackets/blob/main/Cars/Markers/1983-toyota-sprinter-trueno-gt-apex-ae86.png?raw=true",
-				ModelUrl = "https://raw.githubusercontent.com/johnburitto/ARPackets/refs/heads/main/Cars/Models/1983-toyota-sprinter-trueno-gt-apex-ae86.glb"
-			},
-			new()
-			{
-				Name = "bmw-x7-m60i",
-				MarkerUrl = "https://github.com/johnburitto/ARPackets/blob/main/Cars/Markers/bmw-x7-m60i.png?raw=true",
-				ModelUrl = "https://raw.githubusercontent.com/johnburitto/ARPackets/refs/heads/main/Cars/Models/bmw-x7-m60i.glb"
-			},
-			new()
-			{
-				Name = "cartoon-car",
-				MarkerUrl = "https://github.com/johnburitto/ARPackets/blob/main/Cars/Markers/cartoon-car.png?raw=true",
-				ModelUrl = "https://raw.githubusercontent.com/johnburitto/ARPackets/refs/heads/main/Cars/Models/cartoon-car.glb"
-			},
-			new()
-			{
-				Name = "ford-gt-17",
-				MarkerUrl = "https://github.com/johnburitto/ARPackets/blob/main/Cars/Markers/ford-gt-17.png?raw=true",
-				ModelUrl = "https://raw.githubusercontent.com/johnburitto/ARPackets/refs/heads/main/Cars/Models/ford-gt-17.glb"
-			},
-			new()
-			{
-				Name = "lamborghini",
-				MarkerUrl = "https://github.com/johnburitto/ARPackets/blob/main/Cars/Markers/lamborghini.png?raw=true",
-				ModelUrl = "https://raw.githubusercontent.com/johnburitto/ARPackets/refs/heads/main/Cars/Models/lamborghini.glb"
-			}
-		}
-	};
 
 	/// <summary>
 	/// Placeholder for downloaded objects.
@@ -66,22 +25,13 @@ public class ArPacketLoader : MonoBehaviour
 
 	#endregion
 
-	#region Main Pipeline
-
-	async void Start()
-	{
-		await ProcessArPacketSource(_arPacketSource);
-	}
-
-	#endregion
-
-	#region Private Methods
+	#region Public Methods
 
 	/// <summary>
 	/// Process ar packet source.
 	/// </summary>
 	/// <param name="arPacketSource">Ar packet source.</param>
-	private async Task ProcessArPacketSource(ArPacketSource arPacketSource)
+	public async Task ProcessArPacketSource(ArPacketSource arPacketSource)
 	{
 		CreateDirectories(arPacketSource.Name);
 
@@ -90,6 +40,32 @@ public class ArPacketLoader : MonoBehaviour
 			StartCoroutine(DownloadAndSaveMarker(element.MarkerUrl, arPacketSource.Name, element.Name));
 			await LoadModel(element.ModelUrl);
 			await ExportModel(arPacketSource.Name, element.Name);
+		}
+	}
+
+	#endregion
+
+	#region Private Methods
+
+	/// <summary>
+	/// Creates ar packet folders.
+	/// </summary>
+	/// <param name="packetName">Ar packet name.</param>
+	private void CreateDirectories(string packetName)
+	{
+		if (!Directory.Exists($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}"))
+		{
+			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}");
+		}
+
+		if (!Directory.Exists($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Models"))
+		{
+			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Models");
+		}
+
+		if (!Directory.Exists($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Markers"))
+		{
+			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Markers");
 		}
 	}
 
@@ -173,28 +149,6 @@ public class ArPacketLoader : MonoBehaviour
 			{
 				logger.LogAll();
 			}
-		}
-	}
-
-	/// <summary>
-	/// Creates ar packet folders.
-	/// </summary>
-	/// <param name="packetName">Ar packet name.</param>
-	private void CreateDirectories(string packetName)
-	{
-		if (!Directory.Exists($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}"))
-		{
-			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}");
-		}
-
-		if (!Directory.Exists($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Models"))
-		{
-			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Models");
-		}
-
-		if (!Directory.Exists($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Markers"))
-		{
-			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Markers");
 		}
 	}
 
