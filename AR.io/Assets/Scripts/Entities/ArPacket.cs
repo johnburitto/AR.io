@@ -21,6 +21,11 @@ namespace Assets.Scripts.Entities
 		public string Name { get; set; }
 	
 		/// <summary>
+		/// Packet author.
+		/// </summary>
+		public string Author { get; set; }
+
+		/// <summary>
 		/// Show whether packet is enabled or not.
 		/// </summary>
 		public bool IsEnabled { get; set; }

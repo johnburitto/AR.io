@@ -11,7 +11,15 @@ namespace Assets.Scripts.LoadEntities
 		/// Name.
 		/// </summary>
 		public string Name { get; set; }
-	
+		
+		/// <summary>
+		/// Author.
+		/// </summary>
+		public string Author { get; set; }
+
+		/// <summary>
+		/// Elements of Ar Pack.
+		/// </summary>
 		public List<ArPacketData> Elements { get; set; }
 	}
 }

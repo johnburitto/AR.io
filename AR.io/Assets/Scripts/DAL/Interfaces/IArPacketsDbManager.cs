@@ -14,5 +14,13 @@ namespace Assets.Scripts.DAL.Interfaces
 		/// </summary>
 		/// <returns>List of ar packets</returns>
 		List<ArPacket> GetEnabledArPackets();
+
+		/// <summary>
+		/// Gets enabled Ar Packet by its name and author.
+		/// </summary>
+		/// <param name="name">Packet name.</param>
+		/// <param name="author">Packet author.</param>
+		/// <returns>Ar Packet.</returns>
+		ArPacket GetArPacketByNameAndAuthor(string name, string author);
 	}
 }

@@ -11,6 +11,9 @@ using GLTFast.Logging;
 using UnityEngine;
 using UnityEngine.Networking;
 
+using Assets.Scripts.FileManagement.Interfaces;
+using Assets.Scripts.FileManagement.Implementations;
+
 /// <summary>
 /// Ar Packets loader.
 /// </summary>
@@ -21,7 +24,21 @@ public class ArPacketLoader : MonoBehaviour
 	/// <summary>
 	/// Placeholder for downloaded objects.
 	/// </summary>
-	private GameObject targetObject;
+	private GameObject _targetObject;
+
+	/// <summary>
+	/// File manager.
+	/// </summary>
+	private IFileManager _fileManager;
+
+	#endregion
+
+	#region Main Pipeline
+
+	private void Start()
+	{
+		_fileManager = new FileManager();
+	}
 
 	#endregion
 
@@ -33,13 +50,13 @@ public class ArPacketLoader : MonoBehaviour
 	/// <param name="arPacketSource">Ar packet source.</param>
 	public async Task ProcessArPacketSource(ArPacketSource arPacketSource)
 	{
-		CreateDirectories(arPacketSource.Name);
+		CreateDirectories(arPacketSource.Author, arPacketSource.Name);
 
 		foreach (var element in arPacketSource.Elements)
 		{
-			StartCoroutine(DownloadAndSaveMarker(element.MarkerUrl, arPacketSource.Name, element.Name));
+			StartCoroutine(DownloadAndSaveMarker(element.MarkerUrl, arPacketSource.Author, arPacketSource.Name, element.Name));
 			await LoadModel(element.ModelUrl);
-			await ExportModel(arPacketSource.Name, element.Name);
+			await ExportModel(arPacketSource.Author,arPacketSource.Name, element.Name);
 		}
 	}
 
@@ -51,21 +68,21 @@ public class ArPacketLoader : MonoBehaviour
 	/// Creates ar packet folders.
 	/// </summary>
 	/// <param name="packetName">Ar packet name.</param>
-	private void CreateDirectories(string packetName)
+	private void CreateDirectories(string author, string packetName)
 	{
-		if (!Directory.Exists($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}"))
+		if (!Directory.Exists($"{_fileManager.BasePath}/{author}/{packetName}"))
 		{
-			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}");
+			Directory.CreateDirectory($"{_fileManager.BasePath}/{author}/{packetName}");
 		}
 
-		if (!Directory.Exists($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Models"))
+		if (!Directory.Exists($"{_fileManager.BasePath}/{author}/{packetName}/Models"))
 		{
-			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Models");
+			Directory.CreateDirectory($"{_fileManager.BasePath}/{author}/{packetName}/Models");
 		}
 
-		if (!Directory.Exists($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Markers"))
+		if (!Directory.Exists($"{_fileManager.BasePath}/{author}/{packetName}/Markers"))
 		{
-			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Markers");
+			Directory.CreateDirectory($"{_fileManager.BasePath}/{author}/{packetName}/Markers");
 		}
 	}
 
@@ -75,17 +92,17 @@ public class ArPacketLoader : MonoBehaviour
 	/// <param name="url">Marker url.</param>
 	/// <param name="packetName">Ar packet name.</param>
 	/// <param name="elementName">Element name.</param>
-	private IEnumerator DownloadAndSaveMarker(string url, string packetName, string elementName)
+	private IEnumerator DownloadAndSaveMarker(string url, string author, string packetName, string elementName)
 	{
 		using (UnityWebRequest request = UnityWebRequest.Get(url))
 		{
-			request.downloadHandler = new DownloadHandlerFile($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Markers/{elementName}.png");
+			request.downloadHandler = new DownloadHandlerFile($"{_fileManager.BasePath}/{author}/{packetName}/Markers/{elementName}.png");
 
 			yield return request.SendWebRequest();
 
 			if (request.result == UnityWebRequest.Result.Success)
 			{
-				Debug.Log($"Файл успішно завантажено: {Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Markers/{elementName}.png");
+				Debug.Log($"Файл успішно завантажено: {_fileManager.BasePath}/{author}/{packetName}/Markers/{elementName}.png");
 			}
 			else
 			{
@@ -100,8 +117,8 @@ public class ArPacketLoader : MonoBehaviour
 	/// <param name="url">Model url.</param>
 	private async Task LoadModel(string url)
 	{
-		targetObject = new GameObject("ModelHolder");
-		targetObject.transform.position = new Vector3(0, 0, 300);
+		_targetObject = new GameObject("ModelHolder");
+		_targetObject.transform.position = new Vector3(0, 0, 300);
 
 		var gltf = new GltfImport();
 
@@ -113,7 +130,7 @@ public class ArPacketLoader : MonoBehaviour
 			return;
 		}
 
-		await gltf.InstantiateMainSceneAsync(targetObject.transform);
+		await gltf.InstantiateMainSceneAsync(_targetObject.transform);
 
 		Debug.Log("Модель успішно завантажено!");
 	}
@@ -123,15 +140,15 @@ public class ArPacketLoader : MonoBehaviour
 	/// </summary>
 	/// <param name="packetName">Ar packet name.</param>
 	/// <param name="elementName">Element name.</param>
-	private async Task ExportModel(string packetName, string elementName)
+	private async Task ExportModel(string author, string packetName, string elementName)
 	{
 		var logger = new CollectingLogger();
 		var settings = new ExportSettings { Format = GltfFormat.Binary };
 		var exporter = new GameObjectExport(settings, logger: logger);
 
-		targetObject.transform.localScale = new Vector3(50, 50, 50);
+		_targetObject.transform.localScale = new Vector3(50, 50, 50);
 
-		exporter.AddScene(new GameObject[] { targetObject }, "scene");
+		exporter.AddScene(new GameObject[] { _targetObject }, "scene");
 		
 		using (var stream = new MemoryStream())
 		{
@@ -139,11 +156,11 @@ public class ArPacketLoader : MonoBehaviour
 
 			if (success)
 			{
-				var path = Path.Combine($"{Directory.GetCurrentDirectory()}/Assets/ARPackets/{packetName}/Models/{elementName}.glb");
+				var path = Path.Combine($"{_fileManager.BasePath}/{author}/{packetName}/Models/{elementName}.glb");
 				
 				File.WriteAllBytes(path, stream.ToArray());
 				Debug.Log("Saved: " + path);
-				Destroy(targetObject);
+				Destroy(_targetObject);
 			}
 			else
 			{

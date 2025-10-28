@@ -21,6 +21,9 @@ namespace Assets.Scripts
 		/// </summary>
 		public static IFileManager FileManager => new FileManager();
 
+		/// <summary>
+		/// Ar Packets db manager.
+		/// </summary>
 		public static IArPacketsDbManager ArPacketsDbManager = new ArPacketsDbManager();
 	}
 }

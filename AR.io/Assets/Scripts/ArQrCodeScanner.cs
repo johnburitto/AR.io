@@ -1,7 +1,9 @@
 using System;
 using System.Threading.Tasks;
 
+using Assets.Scripts;
 using Assets.Scripts.LoadEntities;
+using Assets.Scripts.DAL.Interfaces;
 
 using Newtonsoft.Json;
 
@@ -13,6 +15,7 @@ using ZXing;
 using ZXing.Common;
 
 using static UnityEngine.XR.ARSubsystems.XRCpuImage;
+using Assets.Scripts.Entities;
 
 /// <summary>
 /// Reads freames from ar camera to finq qr codes.
@@ -50,6 +53,11 @@ public class ArQrCodeScanner : MonoBehaviour
 	/// </summary>
 	private float _timeSinceLastScan = 0f;
 
+	/// <summary>
+	/// Ar Packets db manager.
+	/// </summary>
+	private IArPacketsDbManager _arPacketsDbManager;
+
 	#endregion
 
 	#region Main Pipeline
@@ -64,6 +72,7 @@ public class ArQrCodeScanner : MonoBehaviour
 				TryInverted = true
 			}
 		};
+		_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
 	}
 
 	async void FixedUpdate()
@@ -80,6 +89,13 @@ public class ArQrCodeScanner : MonoBehaviour
 		if (TryReadQrCode(out var sourceUrl))
 		{
 			var (isSuccess, arPacketSource) = await TryDownloadArPacketSource(sourceUrl);
+
+			if (ChekIfArPackAlreadyDownloaded(arPacketSource))
+			{
+				Debug.Log($"Ar Packet '{arPacketSource.Name}' by {arPacketSource.Author} already downloaded!");
+
+				return;
+			}
 
 			if (isSuccess)
 			{
@@ -168,7 +184,7 @@ public class ArQrCodeScanner : MonoBehaviour
 
 					if (arPacketSource != null)
 					{
-						Debug.Log($"Successfully download Ar Packet source '{arPacketSource.Name}'");
+						Debug.Log($"Successfully download Ar Packet source '{arPacketSource.Name}' by {arPacketSource.Author}");
 
 						return (true, arPacketSource);
 					}
@@ -196,6 +212,14 @@ public class ArQrCodeScanner : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Checks if Ar Packet already downloaded.
+	/// </summary>
+	/// <param name="arPacketSource">Ar packet source.</param>
+	/// <returns>Whether Ar Packet is downloaded.</returns>
+	private bool ChekIfArPackAlreadyDownloaded(ArPacketSource arPacketSource)
+		=> _arPacketsDbManager.GetArPacketByNameAndAuthor(arPacketSource.Name, arPacketSource.Author) != null;
+
+	/// <summary>
 	/// Process Ar Packet source and download all packet's elements.
 	/// </summary>
 	/// <param name="arPacketSource">Ar Packet source.</param>
@@ -207,6 +231,13 @@ public class ArQrCodeScanner : MonoBehaviour
 		}
 
 		await _arPacketsLoader.ProcessArPacketSource(arPacketSource);
+		_arPacketsDbManager.Create(new ArPacket
+		{
+			Name = arPacketSource.Name,
+			Author = arPacketSource.Author,
+			IsEnabled = true,
+			AddedDate = DateTime.Now
+		});
 	}
 
 	#endregion

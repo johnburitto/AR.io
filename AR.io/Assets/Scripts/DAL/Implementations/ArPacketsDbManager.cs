@@ -55,6 +55,10 @@ namespace Assets.Scripts.DAL.Implementations
 			=> _db.Table<ArPacket>().ToList();
 
 		/// <inheritdoc/>
+		public ArPacket GetArPacketByNameAndAuthor(string name, string author)
+			=> _db.Table<ArPacket>().FirstOrDefault(arPacket => arPacket.Name == name && arPacket.Author == author && arPacket.IsEnabled);
+
+		/// <inheritdoc/>
 		public ArPacket GetById(Guid id)
 			=> _db.Find<ArPacket>(id);
 
