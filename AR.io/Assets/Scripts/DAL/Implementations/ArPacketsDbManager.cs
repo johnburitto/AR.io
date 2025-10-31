@@ -34,6 +34,14 @@ namespace Assets.Scripts.DAL.Implementations
 		{
 			var dbPath = Path.Combine(Application.persistentDataPath, "data.db");
 
+			if (!File.Exists(dbPath))
+			{
+				File.Create(dbPath).Dispose();
+			}
+
+			SQLitePCL.Batteries.Init();
+			SQLitePCL.Batteries_V2.Init();
+
 			_db = new SQLiteConnection(dbPath);
 			_db.CreateTable<ArPacket>();
 		}

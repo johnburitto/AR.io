@@ -16,6 +16,8 @@ using ZXing.Common;
 
 using static UnityEngine.XR.ARSubsystems.XRCpuImage;
 using Assets.Scripts.Entities;
+using TMPro;
+using Assets.Scripts.DAL.Implementations;
 
 /// <summary>
 /// Reads freames from ar camera to finq qr codes.
@@ -38,6 +40,11 @@ public class ArQrCodeScanner : MonoBehaviour
 	/// Ar Packets loader.
 	/// </summary>
 	[SerializeField] private ArPacketLoader _arPacketsLoader;
+
+	/// <summary>
+	/// Debug info.
+	/// </summary>
+	[SerializeField] private TextMeshProUGUI _debugInfo;
 
 	#endregion
 
@@ -64,6 +71,7 @@ public class ArQrCodeScanner : MonoBehaviour
 
 	void Awake()
 	{
+		_debugInfo.text = $"Start Awake";
 		_barcodeReader = new BarcodeReader()
 		{
 			AutoRotate = true,
@@ -72,7 +80,16 @@ public class ArQrCodeScanner : MonoBehaviour
 				TryInverted = true
 			}
 		};
-		_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
+		try
+		{
+			_debugInfo.text = $"Try to get _arPacketsDbManager";
+			_arPacketsDbManager = new ArPacketsDbManager();
+			_debugInfo.text = $"End Awake";
+		}
+		catch (Exception ex)
+		{
+			_debugInfo.text = $"{Application.persistentDataPath}\n\n\n{ex.Message}\n\n\n{ex.InnerException}";
+		}
 	}
 
 	async void FixedUpdate()
@@ -85,14 +102,14 @@ public class ArQrCodeScanner : MonoBehaviour
 		}
 
 		_timeSinceLastScan = 0;
-		
+
 		if (TryReadQrCode(out var sourceUrl))
 		{
 			var (isSuccess, arPacketSource) = await TryDownloadArPacketSource(sourceUrl);
 
 			if (ChekIfArPackAlreadyDownloaded(arPacketSource))
 			{
-				Debug.Log($"Ar Packet '{arPacketSource.Name}' by {arPacketSource.Author} already downloaded!");
+				_debugInfo.text = $"Ar Packet '{arPacketSource.Name}' by {arPacketSource.Author} already downloaded!";
 
 				return;
 			}
@@ -137,7 +154,7 @@ public class ArQrCodeScanner : MonoBehaviour
 
 				if (result != null)
 				{
-					Debug.Log($"Data from QR code: {result.Text}");
+					_debugInfo.text = $"Data from QR code: {result.Text}";
 
 					sourceUrl = result.Text;
 
@@ -145,7 +162,7 @@ public class ArQrCodeScanner : MonoBehaviour
 				}
 				else
 				{
-					Debug.Log($"Can't read QR code");
+					_debugInfo.text = $"Can't read QR code";
 
 					sourceUrl = null;
 
@@ -184,27 +201,27 @@ public class ArQrCodeScanner : MonoBehaviour
 
 					if (arPacketSource != null)
 					{
-						Debug.Log($"Successfully download Ar Packet source '{arPacketSource.Name}' by {arPacketSource.Author}");
+						_debugInfo.text = $"Successfully download Ar Packet source '{arPacketSource.Name}' by {arPacketSource.Author}";
 
 						return (true, arPacketSource);
 					}
 					else
 					{
-						Debug.LogError($"Url doesn't contatains any Ar Packet sources.");
+						_debugInfo.text = $"Url doesn't contatains any Ar Packet sources.";
 
 						return (false, null);
 					}
 				}
 				catch (Exception )
 				{
-					Debug.LogError($"Url doesn't contatains any Ar Packet sources.");
+					_debugInfo.text = $"Url doesn't contatains any Ar Packet sources.";
 
 					return (false, null);
 				}
 			}
 			else
 			{
-				Debug.LogError($"Can't reach Ar Packet source. Response code: {request.responseCode}");
+				_debugInfo.text = $"Can't reach Ar Packet source. Response code: {request.responseCode}";
 
 				return (false, null);
 			}
