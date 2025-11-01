@@ -13,28 +13,48 @@ using Assets.Scripts.Entities;
 using Assets.Scripts.DAL.Interfaces;
 using Assets.Scripts.FileManagement.Interfaces;
 
-using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
 using TMPro;
+
+using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
+using System;
 
 public class ImageTrackingManager : MonoBehaviour
 {
 	#region Serializes Fields
 
-	[SerializeField] private List<GameObject> _prefabs = new();
-	[SerializeField] private List<Texture2D> _markers = new();
-	[SerializeField] private XRReferenceImageLibrary _library;
+	/// <summary>
+	/// Degug info.
+	/// </summary>
 	[SerializeField] private TextMeshProUGUI _debugInfo;
 
 	#endregion
 
 	#region Private Fields
 
+	/// <summary>
+	/// Ar iamge tarcking manager.
+	/// </summary>
 	private ARTrackedImageManager _arManager;
+
+	/// <summary>
+	/// Ar objects.
+	/// </summary>
 	private Dictionary<string, GameObject> _arObjects;
-	//private IFileManager _fileManager;
+
+	/// <summary>
+	/// File manager.
+	/// </summary>
+	private IFileManager _fileManager;
+	
+	/// <summary>
+	/// Logger.
+	/// </summary>
 	private ILogger _logger;
-	//private IArPacketsDbManager _arPacketsDbManager;
-	private bool _load = true;
+	
+	/// <summary>
+	///  Ar Packets db manager.
+	/// </summary>
+	private IArPacketsDbManager _arPacketsDbManager;
 
 	#endregion
 
@@ -44,9 +64,9 @@ public class ImageTrackingManager : MonoBehaviour
 	{
 		_debugInfo.text = "Start";
 
-		//_fileManager = CompositionRoot.FileManager;
-		//_logger = CompositionRoot.Logger;
-		//_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
+		_fileManager = CompositionRoot.FileManager;
+		_logger = CompositionRoot.Logger;
+		_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
 
 		_debugInfo.text = "After logger";
 
@@ -60,11 +80,28 @@ public class ImageTrackingManager : MonoBehaviour
 
 		_debugInfo.text = "After runtime library";
 
-		if (_arManager != null)
+		_debugInfo.text = "Before markers loaded";
+
+		await LoadMarkers();
+
+		_debugInfo.text = "After markers loaded";
+
+		_debugInfo.text = "Try Load Models";
+
+		try
 		{
-			_arManager.trackablesChanged.AddListener(OnImagesTrackedChanged);
-			UploadArObjects();
+			if (_arManager != null)
+			{
+				_arManager.trackablesChanged.AddListener(OnImagesTrackedChanged);
+				await UploadArObjects();
+			}
 		}
+		catch (Exception e)
+		{
+			_debugInfo.text = $"{e.Message}\n\n\n{e.InnerException}";
+		}
+
+		_debugInfo.text = $"Images count: {_arManager.referenceLibrary.count}\n\n\nModel count:{_arObjects.Count}";
 	}
 
 	private void OnDestroy()
@@ -72,31 +109,18 @@ public class ImageTrackingManager : MonoBehaviour
 		_arManager.trackablesChanged.RemoveListener(OnImagesTrackedChanged);
 	}
 
-	private void Update()
+	private async Task UploadArObjects()
 	{
-		Debug.Log(ARSession.state);
+		var arPackets = _arPacketsDbManager.GetEnabledArPackets();
 
-		if (ARSession.state == ARSessionState.SessionTracking && _load)
+		foreach (var arPacket in arPackets)
 		{
-			_debugInfo.text = "Before markers loaded";
+			var models = await _fileManager.GetModels(arPacket.Author, arPacket.Name);
 
-			LoadMarkers();
-
-			_debugInfo.text = "After markers loaded";
-
-			_load = false;
-		}
-	}
-
-	private void UploadArObjects()
-	{
-		foreach (var prefab in _prefabs)
-		{
-			var arObject = Instantiate(prefab, Vector3.zero, Quaternion.identity);
-
-			arObject.name = prefab.name;
-			arObject.gameObject.SetActive(false);
-			_arObjects.TryAdd(arObject.name, arObject);
+			foreach (var model in models)
+			{
+				_arObjects.TryAdd(model.name, model);
+			}
 		}
 	}
 
@@ -106,6 +130,8 @@ public class ImageTrackingManager : MonoBehaviour
 
 	private void OnImagesTrackedChanged(ARTrackablesChangedEventArgs<ARTrackedImage> eventArgs)
 	{
+		_debugInfo.text = $"Hello From Image Tracking";
+
 		foreach (var item in eventArgs.added)
 		{
 			UpdateTrackedImage(item);
@@ -124,8 +150,6 @@ public class ImageTrackingManager : MonoBehaviour
 
 	private void UpdateTrackedImage(ARTrackedImage image)
 	{
-		_debugInfo.text = $"Hello. Images is: {image.ToString()}";
-
 		if (image == null)
 		{
 			return;
@@ -134,59 +158,46 @@ public class ImageTrackingManager : MonoBehaviour
 		_debugInfo.text = $"Reference image name: {image.referenceImage.name}\n" +
 			$"Image size: {image.referenceImage.size}";
 
-		//if (image.trackingState == TrackingState.Limited ||
-		//	image.trackingState == TrackingState.None)
-		//{
-		//	_arObjects[image.referenceImage.name].gameObject.SetActive(false);
+		if (image.trackingState == TrackingState.Limited ||
+			image.trackingState == TrackingState.None)
+		{
+			_arObjects[image.referenceImage.name].SetActive(false);
 
-		//	return;
-		//}
+			return;
+		}
 
-		//_arObjects[image.referenceImage.name].gameObject.SetActive(true);
-		//_arObjects[image.referenceImage.name].transform.position = image.transform.position;
-		//_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
+		_arObjects[image.referenceImage.name].SetActive(true);
+		_arObjects[image.referenceImage.name].transform.position = image.transform.position;
+		_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
 	}
 
-	private void LoadMarkers()
+	private async Task LoadMarkers()
 	{
 		_debugInfo.text = "Get data from db";
 
-		//var arPackets = _arPacketsDbManager.GetEnabledArPackets();
+		var arPackets = _arPacketsDbManager.GetEnabledArPackets();
 		var runtimeLibrary = _arManager.referenceLibrary as MutableRuntimeReferenceImageLibrary;
 
-		ScheduleMarkers("", runtimeLibrary);
+		foreach (var arPacket in arPackets)
+		{
+			await ScheduleMarkers($"{arPacket.Author}/{arPacket.Name}/Markers", runtimeLibrary);
+		}
 
-		Debug.Log($"{runtimeLibrary.count}");
 		_arManager.referenceLibrary = runtimeLibrary;
 	}
 
-	private void ScheduleMarkers(string path, MutableRuntimeReferenceImageLibrary runtimeLibrary)
+	private async Task ScheduleMarkers(string path, MutableRuntimeReferenceImageLibrary runtimeLibrary)
 	{
 		_debugInfo.text = "Start to get markers";
 
-		//var filePathes = _fileManager.GetMarkerNames("Test/Markers");
-		//var markers = await _fileManager.GetMarkers(filePathes);
+		var filePathes = _fileManager.GetElementsPathes(path);
+		var markers = await _fileManager.GetMarkers(filePathes);
 
 		_debugInfo.text = "Start to upload markers";
 
-		foreach (var marker in _markers)
+		foreach (var marker in markers.Select((value, i) => new { i, value }))
 		{
-			RenderTexture rt = RenderTexture.GetTemporary(
-				marker.width,
-				marker.height,
-				0,
-				RenderTextureFormat.Default,
-				RenderTextureReadWrite.Linear);
-
-			Graphics.Blit(marker, rt);
-			RenderTexture previous = RenderTexture.active;
-			RenderTexture.active = rt;
-
-			Texture2D readableTexture = new Texture2D(marker.width, marker.height);
-			readableTexture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
-			readableTexture.Apply();
-
-			var job = runtimeLibrary.ScheduleAddImageWithValidationJob(readableTexture, marker.name, 0.1f);
+			var job = runtimeLibrary.ScheduleAddImageWithValidationJob(marker.value, Path.GetFileNameWithoutExtension(filePathes[marker.i]), 0.1f);
 
 			job.jobHandle.Complete();
 		}

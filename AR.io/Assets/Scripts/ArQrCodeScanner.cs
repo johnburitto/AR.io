@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 
 using Assets.Scripts;
+using Assets.Scripts.Entities;
 using Assets.Scripts.LoadEntities;
 using Assets.Scripts.DAL.Interfaces;
 
@@ -14,10 +15,9 @@ using UnityEngine.XR.ARFoundation;
 using ZXing;
 using ZXing.Common;
 
-using static UnityEngine.XR.ARSubsystems.XRCpuImage;
-using Assets.Scripts.Entities;
 using TMPro;
-using Assets.Scripts.DAL.Implementations;
+
+using static UnityEngine.XR.ARSubsystems.XRCpuImage;
 
 /// <summary>
 /// Reads freames from ar camera to finq qr codes.
@@ -83,7 +83,7 @@ public class ArQrCodeScanner : MonoBehaviour
 		try
 		{
 			_debugInfo.text = $"Try to get _arPacketsDbManager";
-			_arPacketsDbManager = new ArPacketsDbManager();
+			_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
 			_debugInfo.text = $"End Awake";
 		}
 		catch (Exception ex)
@@ -162,7 +162,7 @@ public class ArQrCodeScanner : MonoBehaviour
 				}
 				else
 				{
-					_debugInfo.text = $"Can't read QR code";
+					//_debugInfo.text = $"Can't read QR code";
 
 					sourceUrl = null;
 

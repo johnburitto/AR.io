@@ -532,18 +532,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 602348615}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b96a37aa45266c4ca414232b7e54568, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _prefabs:
-  - {fileID: 2040866572739662417, guid: 6682311b8a6493149b0b8867626cf0e1, type: 3}
-  - {fileID: 5111543657355057303, guid: 833e9d8f5e0fad94cb52f63934b7bf3d, type: 3}
-  _markers:
-  - {fileID: 2800000, guid: d5f96979616d2441b9f8a6cc4a6fd031, type: 3}
-  - {fileID: 2800000, guid: 57f837dd655a24e1aa621050b481812c, type: 3}
-  _library: {fileID: 11400000, guid: 95916481061242c4e8c3a7af229caa15, type: 2}
   _debugInfo: {fileID: 949521408}
 --- !u!114 &602348620
 MonoBehaviour:

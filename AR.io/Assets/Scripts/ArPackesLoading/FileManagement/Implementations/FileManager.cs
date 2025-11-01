@@ -3,6 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using GLTFast;
+using GLTFast.Materials;
+
 using UnityEngine;
 
 using Assets.Scripts.FileManagement.Interfaces;
@@ -52,8 +55,39 @@ namespace Assets.Scripts.FileManagement.Implementations
 		}
 
 		/// <inheritdoc/>
-		public List<string> GetMarkerNames(string path)
+		public List<string> GetElementsPathes(string path)
 			=> Directory.GetFiles($"{BasePath}/{path}").Where(path => !path.EndsWith(".meta")).ToList();
+
+		/// <inheritdoc/>
+		public async Task<List<GameObject>> GetModels(string author, string packetName)
+		{
+			var models = new List<GameObject>();
+			var modelsPathes = GetElementsPathes($"{author}/{packetName}/Models");
+
+			foreach (var path in modelsPathes)
+			{
+				var modelName = Path.GetFileNameWithoutExtension(path);
+				var gameObject = new GameObject(modelName);
+				var gltf = new GltfImport();
+
+				using (var stream = File.OpenRead(path))
+				{
+					if (!await gltf.LoadStream(stream))
+					{
+						Debug.LogError("Не вдалося завантажити модель!");
+						
+						continue;
+					}
+
+					await gltf.InstantiateMainSceneAsync(gameObject.transform);
+					gameObject.transform.position = Vector3.zero;
+					gameObject.SetActive(false);
+					models.Add(gameObject);
+				}
+			}
+
+			return models;
+		}
 
 		#endregion
 	}

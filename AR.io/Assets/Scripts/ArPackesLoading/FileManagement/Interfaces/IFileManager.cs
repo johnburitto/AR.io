@@ -34,6 +34,14 @@ namespace Assets.Scripts.FileManagement.Interfaces
 		/// </summary>
 		/// <param name="path">Path to markers.</param>
 		/// <returns>List of markers names.</returns>
-		List<string> GetMarkerNames(string path);
+		List<string> GetElementsPathes(string path);
+
+		/// <summary>
+		/// Get Ar Packet models.
+		/// </summary>
+		/// <param name="author">Author.</param>
+		/// <param name="packetName">Ar Packet name.</param>
+		/// <returns>List of Ar Packet models.</returns>
+		Task<List<GameObject>> GetModels(string author, string packetName);
 	}
 }

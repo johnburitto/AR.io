@@ -13,6 +13,7 @@ using UnityEngine.Networking;
 
 using Assets.Scripts.FileManagement.Interfaces;
 using Assets.Scripts.FileManagement.Implementations;
+using GLTFast.Materials;
 
 /// <summary>
 /// Ar Packets loader.
@@ -55,7 +56,7 @@ public class ArPacketLoader : MonoBehaviour
 		foreach (var element in arPacketSource.Elements)
 		{
 			StartCoroutine(DownloadAndSaveMarker(element.MarkerUrl, arPacketSource.Author, arPacketSource.Name, element.Name));
-			await LoadModel(element.ModelUrl);
+			await LoadModel(element.ModelUrl, element.Name);
 			await ExportModel(arPacketSource.Author,arPacketSource.Name, element.Name);
 		}
 	}
@@ -115,10 +116,10 @@ public class ArPacketLoader : MonoBehaviour
 	/// Downloads model.
 	/// </summary>
 	/// <param name="url">Model url.</param>
-	private async Task LoadModel(string url)
+	/// <param name="elementName">Element name.</param>
+	private async Task LoadModel(string url, string elementName)
 	{
-		_targetObject = new GameObject("ModelHolder");
-		_targetObject.transform.position = new Vector3(0, 0, 300);
+		_targetObject = new GameObject(elementName);
 
 		var gltf = new GltfImport();
 
@@ -146,7 +147,7 @@ public class ArPacketLoader : MonoBehaviour
 		var settings = new ExportSettings { Format = GltfFormat.Binary };
 		var exporter = new GameObjectExport(settings, logger: logger);
 
-		_targetObject.transform.localScale = new Vector3(50, 50, 50);
+		_targetObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
 
 		exporter.AddScene(new GameObject[] { _targetObject }, "scene");
 		

@@ -2,6 +2,7 @@
 	"name": "App",
 	"references": [
 		"glTFast",
-		"glTFast.Export"
+		"glTFast.Export",
+		"GLTFast.Materials"
 	]
 }
