@@ -24,7 +24,7 @@ using static UnityEngine.XR.ARSubsystems.XRCpuImage;
 /// </summary>
 public class ArQrCodeScanner : MonoBehaviour
 {
-	#region Serialiez Fields
+	#region Serialized Fields
 
 	/// <summary>
 	/// Period before scans.
@@ -128,7 +128,7 @@ public class ArQrCodeScanner : MonoBehaviour
 	/// <summary>
 	/// Gets ar camera frame and try to read qr code.
 	/// </summary>
-	/// <param name="sourceUrl">Ar packet source url.</param>
+	/// <param name="sourceUrl">Ar Packet source url.</param>
 	/// <returns>Whether qr code was readed or not.</returns>
 	private bool TryReadQrCode(out string sourceUrl)
 	{
@@ -162,8 +162,6 @@ public class ArQrCodeScanner : MonoBehaviour
 				}
 				else
 				{
-					//_debugInfo.text = $"Can't read QR code";
-
 					sourceUrl = null;
 
 					return false;
@@ -231,7 +229,7 @@ public class ArQrCodeScanner : MonoBehaviour
 	/// <summary>
 	/// Checks if Ar Packet already downloaded.
 	/// </summary>
-	/// <param name="arPacketSource">Ar packet source.</param>
+	/// <param name="arPacketSource">Ar Packet source.</param>
 	/// <returns>Whether Ar Packet is downloaded.</returns>
 	private bool ChekIfArPackAlreadyDownloaded(ArPacketSource arPacketSource)
 		=> _arPacketsDbManager.GetArPacketByNameAndAuthor(arPacketSource.Name, arPacketSource.Author) != null;

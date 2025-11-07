@@ -9,7 +9,7 @@ using Assets.Scripts.Logger.Interfaces;
 namespace Assets.Scripts.Logger.Implementations
 {
 	/// <summary>
-	/// Realisation of <see cref="ILoggerProvider"/>.
+	/// Implementation of <see cref="ILoggerProvider"/>.
 	/// </summary>
 	public class UnityLoggerProvider : ILoggerProvider
 	{

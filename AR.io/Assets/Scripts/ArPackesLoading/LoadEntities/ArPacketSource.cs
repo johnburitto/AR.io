@@ -3,12 +3,12 @@
 namespace Assets.Scripts.LoadEntities
 {
 	/// <summary>
-	/// Holds information about all ar packet's elements.
+	/// Holds information about all Ar Packet's elements.
 	/// </summary>
 	public class ArPacketSource
 	{
 		/// <summary>
-		/// Name.
+		/// Ar Packet name.
 		/// </summary>
 		public string Name { get; set; }
 		

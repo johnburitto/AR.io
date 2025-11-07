@@ -2,17 +2,17 @@
 using System.IO;
 using System.Collections.Generic;
 
-using UnityEngine;
-
 using Assets.Scripts.Entities;
 using Assets.Scripts.DAL.Interfaces;
+
+using UnityEngine;
 
 using SQLite;
 
 namespace Assets.Scripts.DAL.Implementations
 {
 	/// <summary>
-	/// Realisation of <see cref="IArPacketsDbManager"/>.
+	/// Implementation of <see cref="IArPacketsDbManager"/>.
 	/// </summary>
 	public class ArPacketsDbManager : IArPacketsDbManager
 	{

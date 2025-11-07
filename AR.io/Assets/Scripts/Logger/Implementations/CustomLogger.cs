@@ -8,7 +8,7 @@ using Assets.Scripts.Logger.Interfaces;
 namespace Assets.Scripts.Logger.Implementations
 {
 	/// <summary>
-	/// Realisation of <see cref="ILogger"/>.
+	/// Implementation of <see cref="ILogger"/>.
 	/// </summary>
 	public class CustomLogger : ILogger
 	{
@@ -43,10 +43,10 @@ namespace Assets.Scripts.Logger.Implementations
 			}));
 
 		/// <inheritdoc/>
-		public void WriteLogs(params (string message, LogLevel logLevel)[] logs)
+		public void WriteLogs(params (string message, LogLevel level)[] logs)
 			=> Providers.ForEach((provider) => provider.WriteLogs(logs.ToList().Select(log => new Log()
 			{
-				Level = log.logLevel,
+				Level = log.level,
 				Message = log.message
 			}).ToArray()));
 

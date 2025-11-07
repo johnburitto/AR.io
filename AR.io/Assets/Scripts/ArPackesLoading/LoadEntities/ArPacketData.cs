@@ -1,12 +1,12 @@
 ﻿namespace Assets.Scripts.LoadEntities
 {
 	/// <summary>
-	/// Holds information about ar packet element.
+	/// Holds information about Ar Packet element.
 	/// </summary>
 	public class ArPacketData
 	{
 		/// <summary>
-		/// Name.
+		/// Ar Paclet element name.
 		/// </summary>
 		public string Name { get; set; }
 	

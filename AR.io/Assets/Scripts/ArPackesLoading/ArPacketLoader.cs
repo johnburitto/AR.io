@@ -1,8 +1,9 @@
 using System.IO;
-using System.Collections;
 using System.Threading.Tasks;
 
 using Assets.Scripts.LoadEntities;
+using Assets.Scripts.FileManagement.Interfaces;
+using Assets.Scripts.FileManagement.Implementations;
 
 using GLTFast;
 using GLTFast.Export;
@@ -11,9 +12,6 @@ using GLTFast.Logging;
 using UnityEngine;
 using UnityEngine.Networking;
 
-using Assets.Scripts.FileManagement.Interfaces;
-using Assets.Scripts.FileManagement.Implementations;
-using GLTFast.Materials;
 
 /// <summary>
 /// Ar Packets loader.
@@ -46,16 +44,16 @@ public class ArPacketLoader : MonoBehaviour
 	#region Public Methods
 
 	/// <summary>
-	/// Process ar packet source.
+	/// Process Ar Packet source.
 	/// </summary>
-	/// <param name="arPacketSource">Ar packet source.</param>
+	/// <param name="arPacketSource">Ar Packet source.</param>
 	public async Task ProcessArPacketSource(ArPacketSource arPacketSource)
 	{
 		CreateDirectories(arPacketSource.Author, arPacketSource.Name);
 
 		foreach (var element in arPacketSource.Elements)
 		{
-			StartCoroutine(DownloadAndSaveMarker(element.MarkerUrl, arPacketSource.Author, arPacketSource.Name, element.Name));
+			await DownloadAndSaveMarker(element.MarkerUrl, arPacketSource.Author, arPacketSource.Name, element.Name);
 			await LoadModel(element.ModelUrl, element.Name);
 			await ExportModel(arPacketSource.Author,arPacketSource.Name, element.Name);
 		}
@@ -66,9 +64,9 @@ public class ArPacketLoader : MonoBehaviour
 	#region Private Methods
 
 	/// <summary>
-	/// Creates ar packet folders.
+	/// Creates Ar Packet folders.
 	/// </summary>
-	/// <param name="packetName">Ar packet name.</param>
+	/// <param name="packetName">Ar Packet name.</param>
 	private void CreateDirectories(string author, string packetName)
 	{
 		if (!Directory.Exists($"{_fileManager.BasePath}/{author}/{packetName}"))
@@ -91,15 +89,16 @@ public class ArPacketLoader : MonoBehaviour
 	/// Downloads marker.
 	/// </summary>
 	/// <param name="url">Marker url.</param>
-	/// <param name="packetName">Ar packet name.</param>
+	/// <param name="author">Ar Packet author.</param>
+	/// <param name="packetName">Ar Packet name.</param>
 	/// <param name="elementName">Element name.</param>
-	private IEnumerator DownloadAndSaveMarker(string url, string author, string packetName, string elementName)
+	private async Task DownloadAndSaveMarker(string url, string author, string packetName, string elementName)
 	{
 		using (UnityWebRequest request = UnityWebRequest.Get(url))
 		{
 			request.downloadHandler = new DownloadHandlerFile($"{_fileManager.BasePath}/{author}/{packetName}/Markers/{elementName}.png");
 
-			yield return request.SendWebRequest();
+			await request.SendWebRequest();
 
 			if (request.result == UnityWebRequest.Result.Success)
 			{
@@ -139,7 +138,8 @@ public class ArPacketLoader : MonoBehaviour
 	/// <summary>
 	/// Saves model on storage.
 	/// </summary>
-	/// <param name="packetName">Ar packet name.</param>
+	/// <param name="author">Ar Packet author.</param>
+	/// <param name="packetName">Ar Packet name.</param>
 	/// <param name="elementName">Element name.</param>
 	private async Task ExportModel(string author, string packetName, string elementName)
 	{

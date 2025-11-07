@@ -7,7 +7,7 @@ using Assets.Scripts.FileManagement.Implementations;
 namespace Assets.Scripts
 {
 	/// <summary>
-	/// Holds all shared instances
+	/// Holds all shared instances.
 	/// </summary>
 	public static class CompositionRoot
 	{

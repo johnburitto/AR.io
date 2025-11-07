@@ -5,14 +5,14 @@ using Assets.Scripts.Entities;
 namespace Assets.Scripts.DAL.Interfaces
 {
 	/// <summary>
-	/// Describes behaviour of ar packets db manager.
+	/// Describes behaviour of Ar Packets db manager.
 	/// </summary>
 	public interface IArPacketsDbManager : IDbManager<ArPacket>
 	{
 		/// <summary>
-		/// Get all enabled ar packets.
+		/// Get all enabled Ar Packets.
 		/// </summary>
-		/// <returns>List of ar packets</returns>
+		/// <returns>List of Ar Packets</returns>
 		List<ArPacket> GetEnabledArPackets();
 
 		/// <summary>

@@ -1,26 +1,24 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+
+using Assets.Scripts;
+using Assets.Scripts.DAL.Interfaces;
+using Assets.Scripts.FileManagement.Interfaces;
 
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-using Assets.Scripts;
-using Assets.Scripts.Enums;
-using Assets.Scripts.Entities;
-using Assets.Scripts.DAL.Interfaces;
-using Assets.Scripts.FileManagement.Interfaces;
-
 using TMPro;
 
 using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
-using System;
 
 public class ImageTrackingManager : MonoBehaviour
 {
-	#region Serializes Fields
+	#region Serialized Fields
 
 	/// <summary>
 	/// Degug info.
@@ -82,7 +80,7 @@ public class ImageTrackingManager : MonoBehaviour
 
 		_debugInfo.text = "Before markers loaded";
 
-		await LoadMarkers();
+		await LoadMarkersAsync();
 
 		_debugInfo.text = "After markers loaded";
 
@@ -93,7 +91,7 @@ public class ImageTrackingManager : MonoBehaviour
 			if (_arManager != null)
 			{
 				_arManager.trackablesChanged.AddListener(OnImagesTrackedChanged);
-				await UploadArObjects();
+				await LoadModelsAsync();
 			}
 		}
 		catch (Exception e)
@@ -109,7 +107,14 @@ public class ImageTrackingManager : MonoBehaviour
 		_arManager.trackablesChanged.RemoveListener(OnImagesTrackedChanged);
 	}
 
-	private async Task UploadArObjects()
+	#endregion
+
+	#region Private Methods
+
+	/// <summary>
+	/// Upload models for markers.
+	/// </summary>
+	private async Task LoadModelsAsync()
 	{
 		var arPackets = _arPacketsDbManager.GetEnabledArPackets();
 
@@ -124,10 +129,10 @@ public class ImageTrackingManager : MonoBehaviour
 		}
 	}
 
-	#endregion
-
-	#region Private Methods
-
+	/// <summary>
+	/// Reacts on changing in tracked images.
+	/// </summary>
+	/// <param name="eventArgs"></param>
 	private void OnImagesTrackedChanged(ARTrackablesChangedEventArgs<ARTrackedImage> eventArgs)
 	{
 		_debugInfo.text = $"Hello From Image Tracking";
@@ -148,6 +153,10 @@ public class ImageTrackingManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Updates tracked image.
+	/// </summary>
+	/// <param name="image">Tracked image.</param>
 	private void UpdateTrackedImage(ARTrackedImage image)
 	{
 		if (image == null)
@@ -158,20 +167,23 @@ public class ImageTrackingManager : MonoBehaviour
 		_debugInfo.text = $"Reference image name: {image.referenceImage.name}\n" +
 			$"Image size: {image.referenceImage.size}";
 
-		if (image.trackingState == TrackingState.Limited ||
-			image.trackingState == TrackingState.None)
-		{
-			_arObjects[image.referenceImage.name].SetActive(false);
+		//if (image.trackingState == TrackingState.Limited ||
+		//	image.trackingState == TrackingState.None)
+		//{
+		//	_arObjects[image.referenceImage.name].SetActive(false);
 
-			return;
-		}
+		//	return;
+		//}
 
-		_arObjects[image.referenceImage.name].SetActive(true);
-		_arObjects[image.referenceImage.name].transform.position = image.transform.position;
-		_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
+		//_arObjects[image.referenceImage.name].SetActive(true);
+		//_arObjects[image.referenceImage.name].transform.position = image.transform.position;
+		//_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
 	}
 
-	private async Task LoadMarkers()
+	/// <summary>
+	/// Load markers for Ar tracking.
+	/// </summary>
+	private async Task LoadMarkersAsync()
 	{
 		_debugInfo.text = "Get data from db";
 
@@ -186,6 +198,11 @@ public class ImageTrackingManager : MonoBehaviour
 		_arManager.referenceLibrary = runtimeLibrary;
 	}
 
+	/// <summary>
+	/// Schedules markers for uploading to runtime library.
+	/// </summary>
+	/// <param name="path">Marker path.</param>
+	/// <param name="runtimeLibrary">Runtime library.</param>
 	private async Task ScheduleMarkers(string path, MutableRuntimeReferenceImageLibrary runtimeLibrary)
 	{
 		_debugInfo.text = "Start to get markers";

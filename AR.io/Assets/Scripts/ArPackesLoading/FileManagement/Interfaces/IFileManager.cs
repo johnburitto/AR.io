@@ -11,7 +11,7 @@ namespace Assets.Scripts.FileManagement.Interfaces
 	public interface IFileManager
 	{
 		/// <summary>
-		/// Base path to ar packets folders.
+		/// Base path to Ar Packets folders.
 		/// </summary>
 		string BasePath { get; set; }
 

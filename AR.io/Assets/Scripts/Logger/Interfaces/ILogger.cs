@@ -17,13 +17,14 @@ namespace Assets.Scripts.Logger.Interfaces
 		/// <summary>
 		/// Write log.
 		/// </summary>
-		/// <param name="log">Log.</param>
+		/// <param name="message">Message.</param>
+		/// <param name="level">Log level.</param>
 		void WriteLog(string message, LogLevel level = LogLevel.Debug);
 
 		/// <summary>
 		/// Write logs.
 		/// </summary>
 		/// <param name="logs">Logs.</param>
-		void WriteLogs(params (string message, LogLevel logLevel)[] logs);
+		void WriteLogs(params (string message, LogLevel level)[] logs);
 	}
 }

@@ -3,17 +3,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using Assets.Scripts.FileManagement.Interfaces;
+
 using GLTFast;
-using GLTFast.Materials;
 
 using UnityEngine;
-
-using Assets.Scripts.FileManagement.Interfaces;
 
 namespace Assets.Scripts.FileManagement.Implementations
 {
 	/// <summary>
-	/// Realisation of <see cref="IFileManager"/>.
+	/// Implementation of <see cref="IFileManager"/>.
 	/// </summary>
 	public class FileManager : IFileManager
 	{
@@ -34,7 +33,7 @@ namespace Assets.Scripts.FileManagement.Implementations
 		/// <inheritdoc/>
 		public async Task<Texture2D> GetMarker(string path)
 		{
-			Texture2D marker = new Texture2D(2, 2);
+			var marker = new Texture2D(2, 2);
 			
 			marker.LoadImage(await File.ReadAllBytesAsync(path));
 
@@ -80,8 +79,10 @@ namespace Assets.Scripts.FileManagement.Implementations
 					}
 
 					await gltf.InstantiateMainSceneAsync(gameObject.transform);
+					
 					gameObject.transform.position = Vector3.zero;
 					gameObject.SetActive(false);
+					
 					models.Add(gameObject);
 				}
 			}
