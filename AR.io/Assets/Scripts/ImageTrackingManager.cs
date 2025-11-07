@@ -18,15 +18,6 @@ using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
 
 public class ImageTrackingManager : MonoBehaviour
 {
-	#region Serialized Fields
-
-	/// <summary>
-	/// Degug info.
-	/// </summary>
-	[SerializeField] private TextMeshProUGUI _debugInfo;
-
-	#endregion
-
 	#region Private Fields
 
 	/// <summary>
@@ -60,46 +51,28 @@ public class ImageTrackingManager : MonoBehaviour
 
 	private async void Start()
 	{
-		_debugInfo.text = "Start";
+		_logger = CompositionRoot.Logger;
+
+		_logger.WriteLog("ImageTrackingManager start Start");
 
 		_fileManager = CompositionRoot.FileManager;
-		_logger = CompositionRoot.Logger;
 		_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
-
-		_debugInfo.text = "After logger";
 
 		_arObjects = new Dictionary<string, GameObject>();
 		_arManager = GetComponent<ARTrackedImageManager>();
 
-		_debugInfo.text = "Before runtime library";
-
 		_arManager.referenceLibrary = _arManager.CreateRuntimeLibrary();
 		_arManager.enabled = true;
 
-		_debugInfo.text = "After runtime library";
-
-		_debugInfo.text = "Before markers loaded";
-
 		await LoadMarkersAsync();
 
-		_debugInfo.text = "After markers loaded";
-
-		_debugInfo.text = "Try Load Models";
-
-		try
+		if (_arManager != null)
 		{
-			if (_arManager != null)
-			{
-				_arManager.trackablesChanged.AddListener(OnImagesTrackedChanged);
-				await LoadModelsAsync();
-			}
-		}
-		catch (Exception e)
-		{
-			_debugInfo.text = $"{e.Message}\n\n\n{e.InnerException}";
+			_arManager.trackablesChanged.AddListener(OnImagesTrackedChanged);
+			await LoadModelsAsync();
 		}
 
-		_debugInfo.text = $"Images count: {_arManager.referenceLibrary.count}\n\n\nModel count:{_arObjects.Count}";
+		_logger.WriteLog($"Images count: {_arManager.referenceLibrary.count}\n\n\nModel count:{_arObjects.Count}");
 	}
 
 	private void OnDestroy()
@@ -135,8 +108,6 @@ public class ImageTrackingManager : MonoBehaviour
 	/// <param name="eventArgs"></param>
 	private void OnImagesTrackedChanged(ARTrackablesChangedEventArgs<ARTrackedImage> eventArgs)
 	{
-		_debugInfo.text = $"Hello From Image Tracking";
-
 		foreach (var item in eventArgs.added)
 		{
 			UpdateTrackedImage(item);
@@ -164,8 +135,7 @@ public class ImageTrackingManager : MonoBehaviour
 			return;
 		}
 
-		_debugInfo.text = $"Reference image name: {image.referenceImage.name}\n" +
-			$"Image size: {image.referenceImage.size}";
+		_logger.WriteLog($"Reference image name: {image.referenceImage.name}\nImage size: {image.referenceImage.size}");
 
 		//if (image.trackingState == TrackingState.Limited ||
 		//	image.trackingState == TrackingState.None)
@@ -185,8 +155,6 @@ public class ImageTrackingManager : MonoBehaviour
 	/// </summary>
 	private async Task LoadMarkersAsync()
 	{
-		_debugInfo.text = "Get data from db";
-
 		var arPackets = _arPacketsDbManager.GetEnabledArPackets();
 		var runtimeLibrary = _arManager.referenceLibrary as MutableRuntimeReferenceImageLibrary;
 
@@ -205,12 +173,10 @@ public class ImageTrackingManager : MonoBehaviour
 	/// <param name="runtimeLibrary">Runtime library.</param>
 	private async Task ScheduleMarkers(string path, MutableRuntimeReferenceImageLibrary runtimeLibrary)
 	{
-		_debugInfo.text = "Start to get markers";
+		_logger.WriteLog("Start to get markers");
 
 		var filePathes = _fileManager.GetElementsPathes(path);
 		var markers = await _fileManager.GetMarkers(filePathes);
-
-		_debugInfo.text = "Start to upload markers";
 
 		foreach (var marker in markers.Select((value, i) => new { i, value }))
 		{
@@ -219,7 +185,7 @@ public class ImageTrackingManager : MonoBehaviour
 			job.jobHandle.Complete();
 		}
 
-		_debugInfo.text = "Markers uploaded";
+		_logger.WriteLog("Markers uploaded");
 	}
 
 	#endregion

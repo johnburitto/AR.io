@@ -537,7 +537,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b96a37aa45266c4ca414232b7e54568, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _debugInfo: {fileID: 949521408}
 --- !u!114 &602348620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -553,7 +552,6 @@ MonoBehaviour:
   _scanInterval: 1
   _cameraManager: {fileID: 1280103466}
   _arPacketsLoader: {fileID: 602348621}
-  _debugInfo: {fileID: 949521408}
 --- !u!114 &602348621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -795,7 +793,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4b99f4980576204b8bcc34ed97a5574, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _types: 00000000
+  _types: 0000000001000000
+  _debugInfo: {fileID: 949521408}
 --- !u!1 &1280103462
 GameObject:
   m_ObjectHideFlags: 0

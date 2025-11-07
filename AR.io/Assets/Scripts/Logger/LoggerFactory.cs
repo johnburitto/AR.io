@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 
-using UnityEngine;
-
 using Assets.Scripts;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Logger.Interfaces;
 using Assets.Scripts.Logger.Implementations;
+
+using TMPro;
+
+using UnityEngine;
 
 /// <summary>
 /// Logger factory for <see cref="ILoggerProvider"/>.
@@ -18,6 +20,11 @@ public class LoggerFactory : MonoBehaviour
 	/// List of logger provider types.
 	/// </summary>
 	[SerializeField] private List<LoggerPoviderType> _types;
+
+	/// <summary>
+	/// Debug info UI element.
+	/// </summary>
+	[SerializeField] private TextMeshProUGUI _debugInfo;
 
 	#endregion
 
@@ -52,6 +59,7 @@ public class LoggerFactory : MonoBehaviour
 		=> type switch
 		{
 			LoggerPoviderType.Unity => new UnityLoggerProvider(),
+			LoggerPoviderType.DebugInfo => new DebugInfoLoggerProvider(_debugInfo),
 			_ => new UnityLoggerProvider()
 		};
 
