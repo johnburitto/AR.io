@@ -1,10 +1,11 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Assets.Scripts;
+using Assets.Scripts.DAL.Interfaces;
 using Assets.Scripts.Entities;
 using Assets.Scripts.LoadEntities;
-using Assets.Scripts.DAL.Interfaces;
 
 using Newtonsoft.Json;
 
@@ -16,6 +17,7 @@ using ZXing;
 using ZXing.Common;
 
 using static UnityEngine.XR.ARSubsystems.XRCpuImage;
+
 using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
 
 /// <summary>
@@ -40,6 +42,26 @@ public class ArQrCodeScanner : MonoBehaviour
 	/// </summary>
 	[SerializeField] private ArPacketLoader _arPacketsLoader;
 
+	/// <summary>
+	/// Qr code outliner.
+	/// </summary>
+	[SerializeField] private RectTransform _qrOutliner;
+
+	/// <summary>
+	/// Qr code outliner.
+	/// </summary>
+	[SerializeField] private RectTransform _qrData;
+
+	/// <summary>
+	/// Accept button.
+	/// </summary>
+	[SerializeField] private RectTransform _acceptButton;
+
+	/// <summary>
+	/// Decline button.
+	/// </summary>
+	[SerializeField] private RectTransform _declineButton;
+
 	#endregion
 
 	#region Private Fields
@@ -63,6 +85,11 @@ public class ArQrCodeScanner : MonoBehaviour
 	/// Logger.
 	/// </summary>
 	private ILogger _logger;
+
+	/// <summary>
+	/// Qr code points.
+	/// </summary>
+	private ResultPoint[] _resultPoints;
 
 	#endregion
 
@@ -102,16 +129,11 @@ public class ArQrCodeScanner : MonoBehaviour
 		{
 			var (isSuccess, arPacketSource) = await TryDownloadArPacketSource(sourceUrl);
 
-			if (ChekIfArPackAlreadyDownloaded(arPacketSource))
-			{
-				_logger.WriteLog($"Ar Packet '{arPacketSource.Name}' by {arPacketSource.Author} already downloaded!");
-
-				return;
-			}
-
 			if (isSuccess)
 			{
-				await DownloadArPacket(arPacketSource);
+				UpdateQrUi(true, arPacketSource);
+
+				//await DownloadArPacket(arPacketSource);
 			}
 		}
 	}
@@ -152,12 +174,15 @@ public class ArQrCodeScanner : MonoBehaviour
 					_logger.WriteLog($"Data from QR code: {result.Text}");
 
 					sourceUrl = result.Text;
+					_resultPoints = result.ResultPoints;
 
 					return true;
 				}
 				else
 				{
 					sourceUrl = null;
+
+					UpdateQrUi(false, null);
 
 					return false;
 				}
@@ -248,6 +273,56 @@ public class ArQrCodeScanner : MonoBehaviour
 			IsEnabled = true,
 			AddedDate = DateTime.Now
 		});
+	}
+
+	/// <summary>
+	/// Shows/hides and updates UI elements for QR code.
+	/// </summary>
+	/// <param name="isShow">Indicates whether show or hide UI.</param>
+	/// <param name="arPacket">Ar Packet.</param>
+	private void UpdateQrUi(bool isShow, ArPacketSource arPacketSource)
+	{
+		if (!isShow)
+		{
+			_qrOutliner.gameObject.SetActive(false);
+			_qrData.gameObject.SetActive(false);
+			_acceptButton.gameObject.SetActive(false);
+			_declineButton.gameObject.SetActive(false);
+
+			return;
+		}
+
+		var minX = _resultPoints.Min(p => p.X);
+		var minY = _resultPoints.Min(p => p.Y);
+		var maxX = _resultPoints.Max(p => p.X);
+		var maxY = _resultPoints.Max(p => p.Y);
+
+		var textureWidth = (maxX - minX) * 1.5f;
+		var textureHeight = (maxY - minY) * 1.5f;
+		var buttonsHeight = _acceptButton.rect.height;
+		var qrOutlinerRenderer = _qrOutliner.gameObject.GetComponent<UnityEngine.UI.Image>();
+		var qrDataRenderer = _qrData.gameObject.GetComponent<UnityEngine.UI.Image>();
+
+		_qrOutliner.sizeDelta = new Vector2(textureWidth, textureHeight);
+		_qrData.anchoredPosition = new Vector2(0, textureHeight / 1.5f - 5f);
+		_acceptButton.anchoredPosition = new Vector2(-textureWidth / 4, - textureHeight / 2 - buttonsHeight);
+		_declineButton.anchoredPosition = new Vector2(textureWidth / 4, - textureHeight / 2 - buttonsHeight);
+
+		if (ChekIfArPackAlreadyDownloaded(arPacketSource))
+		{
+			qrOutlinerRenderer.color = Color.green;
+			qrDataRenderer.color = Color.green;
+		}
+		else
+		{
+			qrOutlinerRenderer.color = Color.gray;
+			qrDataRenderer.color = Color.gray;
+		}
+
+		_qrOutliner.gameObject.SetActive(true);
+		_qrData.gameObject.SetActive(true);
+		_acceptButton.gameObject.SetActive(true);
+		_declineButton.gameObject.SetActive(true);
 	}
 
 	#endregion
