@@ -9,6 +9,7 @@ using Assets.Scripts.LoadEntities;
 
 using Newtonsoft.Json;
 
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.XR.ARFoundation;
@@ -43,24 +44,9 @@ public class ArQrCodeScanner : MonoBehaviour
 	[SerializeField] private ArPacketLoader _arPacketsLoader;
 
 	/// <summary>
-	/// Qr code outliner.
+	/// Qr code scanner UI manager.
 	/// </summary>
-	[SerializeField] private RectTransform _qrOutliner;
-
-	/// <summary>
-	/// Qr code outliner.
-	/// </summary>
-	[SerializeField] private RectTransform _qrData;
-
-	/// <summary>
-	/// Accept button.
-	/// </summary>
-	[SerializeField] private RectTransform _acceptButton;
-
-	/// <summary>
-	/// Decline button.
-	/// </summary>
-	[SerializeField] private RectTransform _declineButton;
+	[SerializeField] private ArQrCodeScannerUIManager _uiManager;
 
 	#endregion
 
@@ -110,6 +96,7 @@ public class ArQrCodeScanner : MonoBehaviour
 			}
 		};
 		_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
+		_uiManager.SetDeclineButtonOnClick(HideUI);
 
 		_logger.WriteLog("ArQrCodeScanner end Start");
 	}
@@ -131,9 +118,8 @@ public class ArQrCodeScanner : MonoBehaviour
 
 			if (isSuccess)
 			{
-				UpdateQrUi(true, arPacketSource);
-
-				//await DownloadArPacket(arPacketSource);
+				_uiManager.UpdateQrUi(true, _resultPoints, arPacketSource);
+				_uiManager.SetAcceptButtonOnClick(async () => await DownloadArPacket(arPacketSource));
 			}
 		}
 	}
@@ -182,7 +168,7 @@ public class ArQrCodeScanner : MonoBehaviour
 				{
 					sourceUrl = null;
 
-					UpdateQrUi(false, null);
+					HideUI();
 
 					return false;
 				}
@@ -247,14 +233,6 @@ public class ArQrCodeScanner : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Checks if Ar Packet already downloaded.
-	/// </summary>
-	/// <param name="arPacketSource">Ar Packet source.</param>
-	/// <returns>Whether Ar Packet is downloaded.</returns>
-	private bool ChekIfArPackAlreadyDownloaded(ArPacketSource arPacketSource)
-		=> _arPacketsDbManager.GetArPacketByNameAndAuthor(arPacketSource.Name, arPacketSource.Author) != null;
-
-	/// <summary>
 	/// Process Ar Packet source and download all packet's elements.
 	/// </summary>
 	/// <param name="arPacketSource">Ar Packet source.</param>
@@ -273,56 +251,16 @@ public class ArQrCodeScanner : MonoBehaviour
 			IsEnabled = true,
 			AddedDate = DateTime.Now
 		});
+
+		HideUI();
 	}
 
 	/// <summary>
-	/// Shows/hides and updates UI elements for QR code.
+	/// Hides UI.
 	/// </summary>
-	/// <param name="isShow">Indicates whether show or hide UI.</param>
-	/// <param name="arPacket">Ar Packet.</param>
-	private void UpdateQrUi(bool isShow, ArPacketSource arPacketSource)
+	private void HideUI()
 	{
-		if (!isShow)
-		{
-			_qrOutliner.gameObject.SetActive(false);
-			_qrData.gameObject.SetActive(false);
-			_acceptButton.gameObject.SetActive(false);
-			_declineButton.gameObject.SetActive(false);
-
-			return;
-		}
-
-		var minX = _resultPoints.Min(p => p.X);
-		var minY = _resultPoints.Min(p => p.Y);
-		var maxX = _resultPoints.Max(p => p.X);
-		var maxY = _resultPoints.Max(p => p.Y);
-
-		var textureWidth = (maxX - minX) * 1.5f;
-		var textureHeight = (maxY - minY) * 1.5f;
-		var buttonsHeight = _acceptButton.rect.height;
-		var qrOutlinerRenderer = _qrOutliner.gameObject.GetComponent<UnityEngine.UI.Image>();
-		var qrDataRenderer = _qrData.gameObject.GetComponent<UnityEngine.UI.Image>();
-
-		_qrOutliner.sizeDelta = new Vector2(textureWidth, textureHeight);
-		_qrData.anchoredPosition = new Vector2(0, textureHeight / 1.5f - 5f);
-		_acceptButton.anchoredPosition = new Vector2(-textureWidth / 4, - textureHeight / 2 - buttonsHeight);
-		_declineButton.anchoredPosition = new Vector2(textureWidth / 4, - textureHeight / 2 - buttonsHeight);
-
-		if (ChekIfArPackAlreadyDownloaded(arPacketSource))
-		{
-			qrOutlinerRenderer.color = Color.green;
-			qrDataRenderer.color = Color.green;
-		}
-		else
-		{
-			qrOutlinerRenderer.color = Color.gray;
-			qrDataRenderer.color = Color.gray;
-		}
-
-		_qrOutliner.gameObject.SetActive(true);
-		_qrData.gameObject.SetActive(true);
-		_acceptButton.gameObject.SetActive(true);
-		_declineButton.gameObject.SetActive(true);
+		_uiManager.UpdateQrUi(false, null, null);
 	}
 
 	#endregion
