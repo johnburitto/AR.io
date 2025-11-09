@@ -248,6 +248,7 @@ public class ArQrCodeScanner : MonoBehaviour
 		{
 			Name = arPacketSource.Name,
 			Author = arPacketSource.Author,
+			Version = arPacketSource.Version,
 			IsEnabled = true,
 			AddedDate = DateTime.Now
 		});

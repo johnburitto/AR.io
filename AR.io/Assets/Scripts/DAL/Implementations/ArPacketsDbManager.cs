@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 
+using Assets.Scripts.Enums;
 using Assets.Scripts.Entities;
 using Assets.Scripts.DAL.Interfaces;
 
@@ -52,7 +53,16 @@ namespace Assets.Scripts.DAL.Implementations
 
 		/// <inheritdoc/>
 		public int Create(ArPacket entity)
-			=> _db.Insert(entity);
+		{
+			var arPacket = GetArPacketByAuthorAndName(entity.Author, entity.Name);
+
+			if (arPacket != null)
+			{
+				return 0;
+			}
+
+			return _db.Insert(entity);
+		}
 
 		/// <inheritdoc/>
 		public void Delete(Guid id)
@@ -63,8 +73,18 @@ namespace Assets.Scripts.DAL.Implementations
 			=> _db.Table<ArPacket>().ToList();
 
 		/// <inheritdoc/>
-		public ArPacket GetArPacketByNameAndAuthor(string name, string author)
-			=> _db.Table<ArPacket>().FirstOrDefault(arPacket => arPacket.Name == name && arPacket.Author == author && arPacket.IsEnabled);
+		public ArPacket GetArPacketByAuthorAndName(string author, string name)
+			=> _db.Table<ArPacket>().FirstOrDefault(arPacket => arPacket.Author == author && arPacket.Name == name);
+
+		/// <inheritdoc/>
+		public ArPacketDbState GetArPacketDbState(string author, string name, string version)
+		{
+			var arPacket = GetArPacketByAuthorAndName(author, name);
+
+			return arPacket == null ? ArPacketDbState.None
+				: arPacket.Version == version ? ArPacketDbState.InDb
+				: ArPacketDbState.DifferentVersion;
+		}
 
 		/// <inheritdoc/>
 		public ArPacket GetById(Guid id)

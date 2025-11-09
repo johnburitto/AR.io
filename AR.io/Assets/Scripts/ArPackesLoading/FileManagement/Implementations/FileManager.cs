@@ -90,6 +90,10 @@ namespace Assets.Scripts.FileManagement.Implementations
 			return models;
 		}
 
+		/// <inheritdoc/>
+		public bool IsArPacketDownloaded(string author, string packetName)
+			=> Directory.Exists($"{BasePath}/{author}/{packetName}");
+
 		#endregion
 	}
 }

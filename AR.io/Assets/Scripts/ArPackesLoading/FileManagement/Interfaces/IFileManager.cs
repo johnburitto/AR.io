@@ -43,5 +43,13 @@ namespace Assets.Scripts.FileManagement.Interfaces
 		/// <param name="packetName">Ar Packet name.</param>
 		/// <returns>List of Ar Packet models.</returns>
 		Task<List<GameObject>> GetModels(string author, string packetName);
+
+		/// <summary>
+		/// Check if Ar Packet is downloaded.
+		/// </summary>
+		/// <param name="author">Author.</param>
+		/// <param name="packetName">Ar Packet name.</param>
+		/// <returns>Whether Ar Packet is downloaded or not.</returns>
+		bool IsArPacketDownloaded(string author, string packetName);
 	}
 }

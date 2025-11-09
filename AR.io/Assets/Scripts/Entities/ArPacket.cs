@@ -26,6 +26,11 @@ namespace Assets.Scripts.Entities
 		public string Author { get; set; }
 
 		/// <summary>
+		/// Packet version.
+		/// </summary>
+		public string Version { get; set; }
+
+		/// <summary>
 		/// Show whether packet is enabled or not.
 		/// </summary>
 		public bool IsEnabled { get; set; }

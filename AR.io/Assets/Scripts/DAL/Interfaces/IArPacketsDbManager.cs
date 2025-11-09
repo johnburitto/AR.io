@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
 using Assets.Scripts.Entities;
+using Assets.Scripts.Enums;
 
 namespace Assets.Scripts.DAL.Interfaces
 {
@@ -16,11 +17,20 @@ namespace Assets.Scripts.DAL.Interfaces
 		List<ArPacket> GetEnabledArPackets();
 
 		/// <summary>
-		/// Gets enabled Ar Packet by its name and author.
+		/// Get enabled Ar Packet db state by its author, name and version.
 		/// </summary>
-		/// <param name="name">Packet name.</param>
 		/// <param name="author">Packet author.</param>
+		/// <param name="name">Packet name.</param>
+		/// <param name="version">Packet version.</param>
+		/// <returns>Ar Packet db state.</returns>
+		ArPacketDbState GetArPacketDbState(string author, string name, string version);
+
+		/// <summary>
+		/// Get Ar Packet by its author and name.
+		/// </summary>
+		/// <param name="author">Packet author.</param>
+		/// <param name="name">Packet name.</param>
 		/// <returns>Ar Packet.</returns>
-		ArPacket GetArPacketByNameAndAuthor(string name, string author);
+		ArPacket GetArPacketByAuthorAndName(string author, string name);
 	}
 }

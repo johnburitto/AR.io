@@ -18,6 +18,11 @@ namespace Assets.Scripts.LoadEntities
 		public string Author { get; set; }
 
 		/// <summary>
+		/// Packet version.
+		/// </summary>
+		public string Version { get; set; }
+
+		/// <summary>
 		/// Elements of Ar Pack.
 		/// </summary>
 		public List<ArPacketData> Elements { get; set; }
