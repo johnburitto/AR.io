@@ -98,6 +98,21 @@ namespace Assets.Scripts.DAL.Implementations
 		public int Update(ArPacket entity)
 			=> _db.Update(entity);
 
+		/// <inheritdoc/>
+		public int CreateUpdateArPacket(ArPacket arPacket)
+		{
+			var createdArPacket = GetArPacketByAuthorAndName(arPacket.Author, arPacket.Name);
+
+			if (arPacket == null)
+			{
+				return Create(arPacket);
+			}
+
+			createdArPacket.Version = arPacket.Version;
+
+			return Update(createdArPacket);
+		}
+
 		#endregion
 	}
 }

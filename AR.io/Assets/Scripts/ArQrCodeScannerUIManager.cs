@@ -13,6 +13,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 
 using ZXing;
+using System.Collections.Generic;
 
 public class ArQrCodeScannerUIManager : MonoBehaviour
 {
@@ -55,6 +56,17 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 	/// </summary>
 	[SerializeField] private TextMeshProUGUI _arNewVersion;
 
+	[Header("Icons")]
+	/// <summary>
+	/// Version arrow.
+	/// </summary>
+	[SerializeField] private Image _versionArrow;
+
+	/// <summary>
+	/// Accept button icons.
+	/// </summary>
+	[SerializeField] private List<Sprite> _acceptButtonIcons;
+ 
 	#endregion
 
 	#region Private Fields
@@ -120,6 +132,7 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 		{
 			_qrOutliner.gameObject.SetActive(false);
 			_qrData.gameObject.SetActive(false);
+			_versionArrow.gameObject.SetActive(false);
 			_acceptButton.gameObject.SetActive(false);
 			_declineButton.gameObject.SetActive(false);
 			_arPacketName.gameObject.SetActive(false);
@@ -201,6 +214,7 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 
 		_qrOutlinerRenderer.color = outlineColor;
 		_qrDataRenderer.color = outlineColor;
+		_versionArrow.color = textColor;
 		_arPacketName.color = textColor;
 		_arCurrentVersion.color = textColor;
 		_arNewVersion.color = textColor;
@@ -230,14 +244,21 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 
 		_qrOutliner.gameObject.SetActive(true);
 		_qrData.gameObject.SetActive(true);
+		_versionArrow.gameObject.SetActive(true);
 		_acceptButton.gameObject.SetActive(true);
 		_declineButton.gameObject.SetActive(true);
 		_arPacketName.gameObject.SetActive(true);
 		_arCurrentVersion.gameObject.SetActive(true);
 		_arNewVersion.gameObject.SetActive(true);
 		
+		if (arPacketDbState != ArPacketDbState.DifferentVersion)
+		{
+			_versionArrow.gameObject.SetActive(false);
+		}
+
 		if (arPacketDbState == ArPacketDbState.None)
 		{
+			_acceptButton.gameObject.GetComponent<Image>().sprite = _acceptButtonIcons[0];
 			_arNewVersion.gameObject.SetActive(false);
 		}
 		else if (arPacketDbState == ArPacketDbState.InDb)
@@ -248,6 +269,10 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 			}
 
 			_arNewVersion.gameObject.SetActive(false);
+		}
+		else if (arPacketDbState == ArPacketDbState.DifferentVersion)
+		{
+			_acceptButton.gameObject.GetComponent<Image>().sprite = _acceptButtonIcons[1];
 		}
 	}
 

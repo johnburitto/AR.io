@@ -85,28 +85,21 @@ public class ImageTrackingManager : MonoBehaviour
 	/// <summary>
 	/// Load to runtime library Ar Packet downloaded from QR code.
 	/// </summary>
-	/// <param name="arPacket">Ar Packet.</param>
-	public async Task LoadArPacketFromQrCode(ArPacket arPacket)
+	public async Task ReloadArPackets()
 	{
-		if (!_fileManager.IsArPacketDownloaded(arPacket.Author, arPacket.Name))
+		_arManager.referenceLibrary = _arManager.CreateRuntimeLibrary();
+		
+		foreach (var arObject in _arObjects)
 		{
-			return;
+			Destroy(arObject.Value);
 		}
 
-		var runtimeLibrary = _arManager.referenceLibrary as MutableRuntimeReferenceImageLibrary;
+		_arObjects.Clear();
 
-		await ScheduleMarkers($"{arPacket.Author}/{arPacket.Name}/Markers", runtimeLibrary);
+		await LoadMarkersAsync();
+		await LoadModelsAsync();
 
-		_arManager.referenceLibrary = runtimeLibrary;
-
-		var models = await _fileManager.GetModels(arPacket.Author, arPacket.Name);
-
-		foreach (var model in models)
-		{
-			_arObjects.TryAdd(model.name, model);
-		}
-
-		_logger.WriteLog($"Images count adter loading: {_arManager.referenceLibrary.count}\n\n\nModel count after loading:{_arObjects.Count}");
+		_logger.WriteLog($"Images count after reload: {_arManager.referenceLibrary.count}\n\n\nModel count after reload:{_arObjects.Count}");
 	}
 
 	#endregion

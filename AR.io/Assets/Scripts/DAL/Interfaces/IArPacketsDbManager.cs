@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
-using Assets.Scripts.Entities;
 using Assets.Scripts.Enums;
+using Assets.Scripts.Entities;
 
 namespace Assets.Scripts.DAL.Interfaces
 {
@@ -32,5 +32,12 @@ namespace Assets.Scripts.DAL.Interfaces
 		/// <param name="name">Packet name.</param>
 		/// <returns>Ar Packet.</returns>
 		ArPacket GetArPacketByAuthorAndName(string author, string name);
+
+		/// <summary>
+		/// Update Ar Packet version.
+		/// </summary>
+		/// <param name="arPacket">Ar Packet.</param>
+		/// <returns>Number of created/updated rows.</returns>
+		int CreateUpdateArPacket(ArPacket arPacket);
 	}
 }

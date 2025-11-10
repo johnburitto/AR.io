@@ -248,21 +248,19 @@ public class ArQrCodeScanner : MonoBehaviour
 			return;
 		}
 
-		var arPacket = new ArPacket
+		await _arPacketsLoader.ProcessArPacketSource(arPacketSource);
+		_arPacketsDbManager.CreateUpdateArPacket(new ArPacket
 		{
 			Name = arPacketSource.Name,
 			Author = arPacketSource.Author,
 			Version = arPacketSource.Version,
 			IsEnabled = true,
 			AddedDate = DateTime.Now
-		};
-
-		await _arPacketsLoader.ProcessArPacketSource(arPacketSource);
-		_arPacketsDbManager.Create(arPacket);
+		});
 
 		HideUI();
 
-		await _imageTrackingManager.LoadArPacketFromQrCode(arPacket);
+		await _imageTrackingManager.ReloadArPackets();
 	}
 
 	/// <summary>
