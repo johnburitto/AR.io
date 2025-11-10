@@ -48,6 +48,11 @@ public class ArQrCodeScanner : MonoBehaviour
 	/// </summary>
 	[SerializeField] private ArQrCodeScannerUIManager _uiManager;
 
+	/// <summary>
+	/// Image tracking manager.
+	/// </summary>
+	[SerializeField] private ImageTrackingManager _imageTrackingManager;
+
 	#endregion
 
 	#region Private Fields
@@ -243,17 +248,21 @@ public class ArQrCodeScanner : MonoBehaviour
 			return;
 		}
 
-		await _arPacketsLoader.ProcessArPacketSource(arPacketSource);
-		_arPacketsDbManager.Create(new ArPacket
+		var arPacket = new ArPacket
 		{
 			Name = arPacketSource.Name,
 			Author = arPacketSource.Author,
 			Version = arPacketSource.Version,
 			IsEnabled = true,
 			AddedDate = DateTime.Now
-		});
+		};
+
+		await _arPacketsLoader.ProcessArPacketSource(arPacketSource);
+		_arPacketsDbManager.Create(arPacket);
 
 		HideUI();
+
+		await _imageTrackingManager.LoadArPacketFromQrCode(arPacket);
 	}
 
 	/// <summary>

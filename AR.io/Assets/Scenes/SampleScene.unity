@@ -633,6 +633,7 @@ MonoBehaviour:
   _cameraManager: {fileID: 1280103466}
   _arPacketsLoader: {fileID: 602348621}
   _uiManager: {fileID: 602348622}
+  _imageTrackingManager: {fileID: 602348619}
 --- !u!114 &602348621
 MonoBehaviour:
   m_ObjectHideFlags: 0

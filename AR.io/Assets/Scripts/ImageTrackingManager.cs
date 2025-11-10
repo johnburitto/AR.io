@@ -1,18 +1,16 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using Assets.Scripts;
+using Assets.Scripts.Entities;
 using Assets.Scripts.DAL.Interfaces;
 using Assets.Scripts.FileManagement.Interfaces;
 
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-
-using TMPro;
 
 using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
 
@@ -82,6 +80,37 @@ public class ImageTrackingManager : MonoBehaviour
 
 	#endregion
 
+	#region Public Methods
+	
+	/// <summary>
+	/// Load to runtime library Ar Packet downloaded from QR code.
+	/// </summary>
+	/// <param name="arPacket">Ar Packet.</param>
+	public async Task LoadArPacketFromQrCode(ArPacket arPacket)
+	{
+		if (!_fileManager.IsArPacketDownloaded(arPacket.Author, arPacket.Name))
+		{
+			return;
+		}
+
+		var runtimeLibrary = _arManager.referenceLibrary as MutableRuntimeReferenceImageLibrary;
+
+		await ScheduleMarkers($"{arPacket.Author}/{arPacket.Name}/Markers", runtimeLibrary);
+
+		_arManager.referenceLibrary = runtimeLibrary;
+
+		var models = await _fileManager.GetModels(arPacket.Author, arPacket.Name);
+
+		foreach (var model in models)
+		{
+			_arObjects.TryAdd(model.name, model);
+		}
+
+		_logger.WriteLog($"Images count adter loading: {_arManager.referenceLibrary.count}\n\n\nModel count after loading:{_arObjects.Count}");
+	}
+
+	#endregion
+
 	#region Private Methods
 
 	/// <summary>
@@ -93,6 +122,11 @@ public class ImageTrackingManager : MonoBehaviour
 
 		foreach (var arPacket in arPackets)
 		{
+			if (!_fileManager.IsArPacketDownloaded(arPacket.Author, arPacket.Name))
+			{
+				continue;
+			}
+
 			var models = await _fileManager.GetModels(arPacket.Author, arPacket.Name);
 
 			foreach (var model in models)
@@ -135,7 +169,7 @@ public class ImageTrackingManager : MonoBehaviour
 			return;
 		}
 
-		_logger.WriteLog($"Reference image name: {image.referenceImage.name}\nImage size: {image.referenceImage.size}");
+		///_logger.WriteLog($"Reference image name: {image.referenceImage.name}\nImage size: {image.referenceImage.size}");
 
 		//if (image.trackingState == TrackingState.Limited ||
 		//	image.trackingState == TrackingState.None)
@@ -160,6 +194,11 @@ public class ImageTrackingManager : MonoBehaviour
 
 		foreach (var arPacket in arPackets)
 		{
+			if (!_fileManager.IsArPacketDownloaded(arPacket.Author, arPacket.Name))
+			{
+				continue;
+			}
+
 			await ScheduleMarkers($"{arPacket.Author}/{arPacket.Name}/Markers", runtimeLibrary);
 		}
 

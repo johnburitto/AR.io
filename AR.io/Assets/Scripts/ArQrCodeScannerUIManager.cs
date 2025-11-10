@@ -235,11 +235,6 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 		_arPacketName.gameObject.SetActive(true);
 		_arCurrentVersion.gameObject.SetActive(true);
 		_arNewVersion.gameObject.SetActive(true);
-
-		if (!isArPacketDownloaded)
-		{
-			_acceptButton.gameObject.SetActive(false);
-		}
 		
 		if (arPacketDbState == ArPacketDbState.None)
 		{
@@ -247,7 +242,11 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 		}
 		else if (arPacketDbState == ArPacketDbState.InDb)
 		{
-			_acceptButton.gameObject.SetActive(false);
+			if (isArPacketDownloaded)
+			{
+				_acceptButton.gameObject.SetActive(false);
+			}
+
 			_arNewVersion.gameObject.SetActive(false);
 		}
 	}
