@@ -15,6 +15,9 @@ using UnityEngine.Events;
 using ZXing;
 using System.Collections.Generic;
 
+/// <summary>
+/// Ar QR code scanner UI manager.
+/// </summary>
 public class ArQrCodeScannerUIManager : MonoBehaviour
 {
 	#region Serialized Fields
@@ -229,7 +232,7 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 		var arPacket = _arPacketsDbManager.GetArPacketByAuthorAndName(arPacketSource.Author, arPacketSource.Name);
 
 		_arPacketName.text = arPacketSource.Name;
-		_arCurrentVersion.text = arPacket.Version;
+		_arCurrentVersion.text = arPacket == null ? "" : arPacket.Version;
 		_arNewVersion.text = arPacketSource.Version;
 	}
 
@@ -259,7 +262,7 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 		if (arPacketDbState == ArPacketDbState.None)
 		{
 			_acceptButton.gameObject.GetComponent<Image>().sprite = _acceptButtonIcons[0];
-			_arNewVersion.gameObject.SetActive(false);
+			_arCurrentVersion.gameObject.SetActive(false);
 		}
 		else if (arPacketDbState == ArPacketDbState.InDb)
 		{

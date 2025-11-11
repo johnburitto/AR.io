@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -11,7 +12,6 @@ using GLTFast.Logging;
 
 using UnityEngine;
 using UnityEngine.Networking;
-
 
 /// <summary>
 /// Ar Packets loader.
@@ -51,9 +51,11 @@ public class ArPacketLoader : MonoBehaviour
 	{
 		CreateDirectories(arPacketSource.Author, arPacketSource.Name);
 
+		await DownloadLogo(arPacketSource.LogoUrl, arPacketSource.Author, arPacketSource.Name);
+
 		foreach (var element in arPacketSource.Elements)
 		{
-			await DownloadAndSaveMarker(element.MarkerUrl, arPacketSource.Author, arPacketSource.Name, element.Name);
+			await DownloadMarker(element.MarkerUrl, arPacketSource.Author, arPacketSource.Name, element.Name);
 			await LoadModel(element.ModelUrl, element.Name);
 			await ExportModel(arPacketSource.Author,arPacketSource.Name, element.Name);
 		}
@@ -86,13 +88,38 @@ public class ArPacketLoader : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Downloads logo.
+	/// </summary>
+	/// <param name="logoUrl">Logo url.</param>
+	/// <param name="author">Ar Packet author.</param>
+	/// <param name="packetName">Ar Packet name.</param>
+	private async Task DownloadLogo(string url, string author, string packetName)
+	{
+		using (UnityWebRequest request = UnityWebRequest.Get(url))
+		{
+			request.downloadHandler = new DownloadHandlerFile($"{_fileManager.BasePath}/{author}/{packetName}/logo.png");
+
+			await request.SendWebRequest();
+
+			if (request.result == UnityWebRequest.Result.Success)
+			{
+				Debug.Log($"Файл успішно завантажено: {_fileManager.BasePath}/{author}/{packetName}/logo.png");
+			}
+			else
+			{
+				Debug.LogError($"Помилка при завантаженні: {request.error}");
+			}
+		}
+	}
+
+	/// <summary>
 	/// Downloads marker.
 	/// </summary>
 	/// <param name="url">Marker url.</param>
 	/// <param name="author">Ar Packet author.</param>
 	/// <param name="packetName">Ar Packet name.</param>
 	/// <param name="elementName">Element name.</param>
-	private async Task DownloadAndSaveMarker(string url, string author, string packetName, string elementName)
+	private async Task DownloadMarker(string url, string author, string packetName, string elementName)
 	{
 		using (UnityWebRequest request = UnityWebRequest.Get(url))
 		{

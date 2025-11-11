@@ -248,6 +248,8 @@ public class ArQrCodeScanner : MonoBehaviour
 			return;
 		}
 
+		HideUI();
+
 		await _arPacketsLoader.ProcessArPacketSource(arPacketSource);
 		_arPacketsDbManager.CreateUpdateArPacket(new ArPacket
 		{
@@ -257,8 +259,6 @@ public class ArQrCodeScanner : MonoBehaviour
 			IsEnabled = true,
 			AddedDate = DateTime.Now
 		});
-
-		HideUI();
 
 		await _imageTrackingManager.ReloadArPackets();
 	}

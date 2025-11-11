@@ -103,7 +103,7 @@ namespace Assets.Scripts.DAL.Implementations
 		{
 			var createdArPacket = GetArPacketByAuthorAndName(arPacket.Author, arPacket.Name);
 
-			if (arPacket == null)
+			if (createdArPacket == null)
 			{
 				return Create(arPacket);
 			}

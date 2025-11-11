@@ -23,6 +23,11 @@ namespace Assets.Scripts.LoadEntities
 		public string Version { get; set; }
 
 		/// <summary>
+		/// Logo url.
+		/// </summary>
+		public string LogoUrl { get; set; }
+
+		/// <summary>
 		/// Elements of Ar Pack.
 		/// </summary>
 		public List<ArPacketData> Elements { get; set; }

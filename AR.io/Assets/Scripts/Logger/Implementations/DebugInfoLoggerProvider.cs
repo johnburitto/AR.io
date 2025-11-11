@@ -30,6 +30,7 @@ namespace Assets.Scripts.Logger.Implementations
 		public DebugInfoLoggerProvider(TextMeshProUGUI debugInfo)
 		{
 			_debugInfo = debugInfo;
+			_debugInfo.gameObject.SetActive(true);
 		}
 
 		#endregion
