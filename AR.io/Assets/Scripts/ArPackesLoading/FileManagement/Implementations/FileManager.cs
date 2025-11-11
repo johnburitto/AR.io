@@ -54,6 +54,16 @@ namespace Assets.Scripts.FileManagement.Implementations
 		}
 
 		/// <inheritdoc/>
+		public async Task<Texture2D> GetLogo(string path)
+		{
+			var logo = new Texture2D(2, 2);
+
+			logo.LoadImage(await File.ReadAllBytesAsync(path));
+
+			return logo;
+		}
+
+		/// <inheritdoc/>
 		public List<string> GetElementsPathes(string path)
 			=> Directory.GetFiles($"{BasePath}/{path}").Where(path => !path.EndsWith(".meta")).ToList();
 

@@ -30,6 +30,13 @@ namespace Assets.Scripts.FileManagement.Interfaces
 		Task<List<Texture2D>> GetMarkers(List<string> pathes);
 
 		/// <summary>
+		/// Get logo by path.
+		/// </summary>
+		/// <param name="path">Logo path.</param>
+		/// <returns>Logo 2D texture.</returns>
+		Task<Texture2D> GetLogo(string path);
+
+		/// <summary>
 		/// Get markers names.
 		/// </summary>
 		/// <param name="path">Path to markers.</param>
