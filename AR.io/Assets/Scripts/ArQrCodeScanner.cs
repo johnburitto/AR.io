@@ -162,8 +162,6 @@ public class ArQrCodeScanner : MonoBehaviour
 
 				if (result != null)
 				{
-					_logger.WriteLog($"Data from QR code: {result.Text}");
-
 					sourceUrl = result.Text;
 					_resultPoints = result.ResultPoints;
 
@@ -210,8 +208,6 @@ public class ArQrCodeScanner : MonoBehaviour
 
 					if (arPacketSource != null)
 					{
-						_logger.WriteLog($"Successfully download Ar Packet source '{arPacketSource.Name}' by {arPacketSource.Author}");
-
 						return (true, arPacketSource);
 					}
 					else

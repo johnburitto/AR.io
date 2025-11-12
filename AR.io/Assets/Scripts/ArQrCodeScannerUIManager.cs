@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections.Generic;
 
 using Assets.Scripts;
 using Assets.Scripts.Enums;
@@ -13,7 +14,8 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 
 using ZXing;
-using System.Collections.Generic;
+
+using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
 
 /// <summary>
 /// Ar QR code scanner UI manager.
@@ -95,6 +97,11 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 	private IFileManager _fileManager;
 
 	/// <summary>
+	/// Logger.
+	/// </summary>
+	private ILogger _logger;
+
+	/// <summary>
 	/// QR outlinr renderer.
 	/// </summary>
 	private Image _qrOutlinerRenderer;
@@ -115,8 +122,9 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 
 	private void Start()
 	{
-		_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
+		_logger = CompositionRoot.Logger;
 		_fileManager = CompositionRoot.FileManager;
+		_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
 	}
 
 	#endregion
@@ -197,12 +205,16 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 		var maxX = resultPoints.Max(p => p.X);
 		var maxY = resultPoints.Max(p => p.Y);
 
-		var textureWidth = (maxX - minX) * 1.5f;
-		var textureHeight = (maxY - minY) * 1.5f;
-		var buttonsHeight = _acceptButton.rect.height;
+		var textureWidth = (maxX - minX) * 6;
+		var textureHeight = (maxY - minY) * 6;
+		var buttonsHeight = _acceptButton.rect.height * 2;
+
+		_logger.WriteLog($"Texture width:{textureWidth}, Texture height:{textureHeight}\n\n\n");
 
 		_qrOutliner.sizeDelta = new Vector2(textureWidth, textureHeight);
-		_qrData.anchoredPosition = new Vector2(0, textureHeight / 1.5f - 5f);
+		_qrData.anchoredPosition = new Vector2(0, textureHeight / 1.5f - 5);
+		_acceptButton.localScale = new Vector3(2, 2);
+		_declineButton.localScale = new Vector3(2, 2);
 		_acceptButton.anchoredPosition = new Vector2(-textureWidth / 4, -textureHeight / 2 - buttonsHeight);
 		_declineButton.anchoredPosition = new Vector2(textureWidth / 4, -textureHeight / 2 - buttonsHeight);
 	}
@@ -261,7 +273,7 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 
 		if (arPacketDbState == ArPacketDbState.None)
 		{
-			_acceptButton.gameObject.GetComponent<Image>().sprite = _acceptButtonIcons[0];
+			_acceptButton.Find("Icon").GetComponent<Image>().sprite = _acceptButtonIcons[0];
 			_arCurrentVersion.gameObject.SetActive(false);
 		}
 		else if (arPacketDbState == ArPacketDbState.InDb)
@@ -275,7 +287,7 @@ public class ArQrCodeScannerUIManager : MonoBehaviour
 		}
 		else if (arPacketDbState == ArPacketDbState.DifferentVersion)
 		{
-			_acceptButton.gameObject.GetComponent<Image>().sprite = _acceptButtonIcons[1];
+			_acceptButton.Find("Icon").GetComponent<Image>().sprite = _acceptButtonIcons[1];
 		}
 	}
 
