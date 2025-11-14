@@ -1,14 +1,18 @@
-using Assets.Scripts;
-using Assets.Scripts.Entities;
-using Assets.Scripts.FileManagement.Interfaces;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Assets.Scripts;
+using Assets.Scripts.Entities;
+using Assets.Scripts.FileManagement.Interfaces;
+
 using TMPro;
-using Unity.XR.CoreUtils;
+
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using Unity.XR.CoreUtils;
+using UnityEngine.XR.ARFoundation;
 
 /// <summary>
 /// Ar Packet details UI manager.
@@ -45,10 +49,14 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 	[SerializeField] private Button _modelsButton;
 
 	/// <summary>
+	/// Cancel button.
+	/// </summary>
+	[SerializeField] private Button _cancelButton;
+
+	/// <summary>
 	/// Layout rectangle.
 	/// </summary>
 	[SerializeField] private GameObject _listItem;
-
 
 	[Header("UI Elements")]
 	/// <summary>
@@ -66,7 +74,33 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 	/// </summary>
 	[SerializeField] private TextMeshProUGUI _arPacketVersion;
 
+	[Header("Ar Components")]
+	/// <summary>
+	/// Ar tracked image manager.
+	/// </summary>
+	[SerializeField] private ARTrackedImageManager _arTrackedImageManager;
+
+	/// <summary>
+	/// Image tracking manager.
+	/// </summary>
+	[SerializeField] private ImageTrackingManager _imageTrackingManager;
+
+	/// <summary>
+	/// Ar QR scanner.
+	/// </summary>
+	[SerializeField] private ArQrCodeScanner _arQrScanner;
+
+	/// <summary>
+	/// Ar Packet loader.
+	/// </summary>
+	[SerializeField] private ArPacketLoader _arPacketLoader;
+
 	[Header("UI Managers")]
+	/// <summary>
+	/// Ar tracked image manager.
+	/// </summary>
+	[SerializeField] private ArQrCodeScannerUIManager _arQrScannerUIManager;
+
 	/// <summary>
 	/// Ar tracked image manager.
 	/// </summary>
@@ -95,6 +129,12 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 		ResizeLayoutCell();
 
 		_fileManager = CompositionRoot.FileManager;
+		_cancelButton.onClick.AddListener(async () => await CloseDetails());
+	}
+
+	private void OnDestroy()
+	{
+		_cancelButton.onClick.RemoveAllListeners();
 	}
 
 	#endregion
@@ -110,13 +150,18 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 		_arPacket = arPacket;
 	}
 
+	/// <summary>
+	/// Show details.
+	/// </summary>
+	/// <returns></returns>
 	public async Task ShowDetails()
 	{
+		_arPacketListUIManager.HideList(false);
+
+		EnableArComponents(false);
 		await PopulateData();
-		
-		EnableUIComponents(true);
-		
 		await LoadMarkers($"{_arPacket.Author}/{_arPacket.Name}/Markers");
+		EnableUIComponents(true);
 	}
 
 	/// <summary>
@@ -180,6 +225,7 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 		_grid.gameObject.SetActive(isEnabled);
 		_markersButton.gameObject.SetActive(isEnabled);
 		_modelsButton.gameObject.SetActive(isEnabled);
+		_cancelButton.gameObject.SetActive(isEnabled);
 		_arPacketName.gameObject.SetActive(isEnabled);
 		_arPacketAuthor.gameObject.SetActive(isEnabled);
 		_arPacketVersion.gameObject.SetActive(isEnabled);
@@ -204,6 +250,32 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 	{
 		_markersButton.onClick.RemoveAllListeners();
 		_markersButton.onClick.AddListener(action);
+	}
+
+	/// <summary>
+	/// Close details.
+	/// </summary>
+	private async Task CloseDetails()
+	{
+		ClearList();
+		EnableUIComponents(false);
+		EnableArComponents(true);
+
+		await _arPacketListUIManager.OpenList();
+	}
+
+	/// <summary>
+	/// Enable/disable Ar components.
+	/// </summary>
+	/// <param name="isEnabled">Is enabled.</param>
+	private void EnableArComponents(bool isEnabled)
+	{
+		_arTrackedImageManager.enabled = isEnabled;
+		_imageTrackingManager.enabled = isEnabled;
+		_arQrScanner.enabled = isEnabled;
+		_arPacketLoader.enabled = isEnabled;
+
+		_arQrScannerUIManager.UpdateQrUi(false, null, null);
 	}
 
 	#endregion

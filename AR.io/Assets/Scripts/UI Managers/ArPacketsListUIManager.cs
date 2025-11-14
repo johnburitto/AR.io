@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 
 using Assets.Scripts;
+using Assets.Scripts.Entities;
 using Assets.Scripts.DAL.Interfaces;
 using Assets.Scripts.FileManagement.Interfaces;
 
@@ -10,7 +11,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.XR.CoreUtils;
 using UnityEngine.XR.ARFoundation;
-using Assets.Scripts.Entities;
 
 /// <summary>
 /// Ar Packets list UI manager.
@@ -70,7 +70,7 @@ public class ArPacketsListUIManager : MonoBehaviour
 	/// <summary>
 	/// Ar tracked image manager.
 	/// </summary>
-	[SerializeField] private ArQrCodeScannerUIManager _arScannerUIManager;
+	[SerializeField] private ArQrCodeScannerUIManager _arQrScannerUIManager;
 
 	/// <summary>
 	/// Ar tracked image manager.
@@ -101,13 +101,45 @@ public class ArPacketsListUIManager : MonoBehaviour
 		_fileManager = CompositionRoot.FileManager;
 
 		_listButton.onClick.AddListener(async () => await OpenList());
-		_cancelButton.onClick.AddListener(HideList);
+		_cancelButton.onClick.AddListener(() => HideList());
 	}
 
 	private void OnDestroy()
 	{
 		_listButton.onClick.RemoveAllListeners();
 		_cancelButton.onClick.RemoveAllListeners();
+	}
+
+	#endregion
+
+	#region Public Methods
+
+	/// <summary>
+	/// Close Ar Packets list.
+	/// </summary>
+	/// <param name="isShowListButton">Indicates whether open or close list button.</param>
+	public void HideList(bool isShowListButton = true)
+	{
+		ClearList();
+
+		_scrollView.SetActive(false);
+		_listButton.gameObject.SetActive(isShowListButton);
+		_cancelButton.gameObject.SetActive(false);
+
+		EnableArComponents(true);
+	}
+
+	/// <summary>
+	/// Open Ar Packets list.
+	/// </summary>
+	public async Task OpenList()
+	{
+		EnableArComponents(false);
+		await PopulateArPacketsList();
+
+		_scrollView.SetActive(true);
+		_listButton.gameObject.SetActive(false);
+		_cancelButton.gameObject.SetActive(true);
 	}
 
 	#endregion
@@ -150,33 +182,6 @@ public class ArPacketsListUIManager : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Open Ar Packets list.
-	/// </summary>
-	private async Task OpenList()
-	{
-		EnableArComponents(false);
-		await PopulateArPacketsList();
-
-		_scrollView.SetActive(true);
-		_listButton.gameObject.SetActive(false);
-		_cancelButton.gameObject.SetActive(true);
-	}
-
-	/// <summary>
-	/// Close Ar Packets list.
-	/// </summary>
-	private void HideList()
-	{
-		ClearList();
-
-		_scrollView.SetActive(false);
-		_listButton.gameObject.SetActive(true);
-		_cancelButton.gameObject.SetActive(false);
-
-		EnableArComponents(true);
-	}
-
-	/// <summary>
 	/// Enable/disable Ar components.
 	/// </summary>
 	/// <param name="isEnabled">Is enabled.</param>
@@ -187,7 +192,7 @@ public class ArPacketsListUIManager : MonoBehaviour
 		_arQrScanner.enabled = isEnabled;
 		_arPacketLoader.enabled = isEnabled;
 
-		_arScannerUIManager.UpdateQrUi(false, null, null);
+		_arQrScannerUIManager.UpdateQrUi(false, null, null);
 	}
 
 	/// <summary>
