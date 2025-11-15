@@ -1,17 +1,15 @@
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-
 using Assets.Scripts;
 using Assets.Scripts.Entities;
 using Assets.Scripts.FileManagement.Interfaces;
-
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using TMPro;
-
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Events;
 using Unity.XR.CoreUtils;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Timeline;
+using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 
 /// <summary>
@@ -97,14 +95,20 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 
 	[Header("UI Managers")]
 	/// <summary>
-	/// Ar tracked image manager.
+	/// Ar Qr code scanner UI manager.
 	/// </summary>
 	[SerializeField] private ArQrCodeScannerUIManager _arQrScannerUIManager;
 
 	/// <summary>
-	/// Ar tracked image manager.
+	/// Ar Packet list UI manager.
 	/// </summary>
 	[SerializeField] private ArPacketsListUIManager _arPacketListUIManager;
+
+	[Header("Utils")]
+	/// <summary>
+	/// Model previewer.
+	/// </summary>
+	[SerializeField] private ModelPreviewer _modelPreviewer;
 
 	#endregion
 
@@ -159,8 +163,9 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 		_arPacketListUIManager.HideList(false);
 
 		EnableArComponents(false);
-		await PopulateData();
+		await PopulateHeaderData();
 		await LoadMarkers($"{_arPacket.Author}/{_arPacket.Name}/Markers");
+		SetModelsButtonOnClick(() => LoadModels($"{_arPacket.Author}/{_arPacket.Name}/Models"));
 		EnableUIComponents(true);
 	}
 
@@ -204,7 +209,7 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 	/// <summary>
 	/// Populate data in UI elements.
 	/// </summary>
-	private async Task PopulateData()
+	private async Task PopulateHeaderData()
 	{
 		var logo = await _fileManager.GetLogo($"{_fileManager.BasePath}/{_arPacket.Author}/{_arPacket.Name}/logo.png");
 
@@ -243,13 +248,23 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Set accept button click event.
+	/// Set markers button click event.
 	/// </summary>
 	/// <param name="action">Action.</param>
 	public void SetMarkersButtonOnClick(UnityAction action)
 	{
 		_markersButton.onClick.RemoveAllListeners();
 		_markersButton.onClick.AddListener(action);
+	}
+
+	/// <summary>
+	/// Set models button click event.
+	/// </summary>
+	/// <param name="action">Action.</param>
+	public void SetModelsButtonOnClick(UnityAction action)
+	{
+		_modelsButton.onClick.RemoveAllListeners();
+		_modelsButton.onClick.AddListener(action);
 	}
 
 	/// <summary>
@@ -276,6 +291,23 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 		_arPacketLoader.enabled = isEnabled;
 
 		_arQrScannerUIManager.UpdateQrUi(false, null, null);
+	}
+
+	private void LoadModels(string path)
+	{
+		ClearList();
+
+		var modelsNames = _fileManager.GetElementsPathes(path).Select(file => Path.GetFileNameWithoutExtension(file));
+
+		foreach (var modelName in modelsNames)
+		{
+			var listItem = Instantiate(_listItem, _grid.transform);
+			var preview = listItem.GetNamedChild("Preview").GetComponent<RawImage>();
+			var text = listItem.GetNamedChild("Name").GetComponent<TMP_Text>();
+
+			preview.texture = _modelPreviewer.GetPreview(_imageTrackingManager[modelName]);
+			text.text = modelName;
+		}
 	}
 
 	#endregion

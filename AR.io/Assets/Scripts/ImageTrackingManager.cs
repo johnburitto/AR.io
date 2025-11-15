@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using Assets.Scripts;
-using Assets.Scripts.Entities;
 using Assets.Scripts.DAL.Interfaces;
 using Assets.Scripts.FileManagement.Interfaces;
 
@@ -39,10 +38,21 @@ public class ImageTrackingManager : MonoBehaviour
 	private ILogger _logger;
 	
 	/// <summary>
-	///  Ar Packets db manager.
+	/// Ar Packets db manager.
 	/// </summary>
 	private IArPacketsDbManager _arPacketsDbManager;
 
+	#endregion
+
+	#region Public Properties
+
+	/// <summary>
+	/// Indexing of Ar objects by their names.
+	/// </summary>
+	/// <param name="name">Ar object name</param>
+	/// <returns>Ar object.</returns>
+	public GameObject this[string name] => _arObjects[name];
+	
 	#endregion
 
 	#region Main Pipeline
