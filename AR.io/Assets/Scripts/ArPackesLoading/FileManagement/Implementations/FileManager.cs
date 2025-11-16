@@ -79,22 +79,19 @@ namespace Assets.Scripts.FileManagement.Implementations
 				var gameObject = new GameObject(modelName);
 				var gltf = new GltfImport();
 
-				using (var stream = File.OpenRead(path))
+				if (!await gltf.LoadFile(path))
 				{
-					if (!await gltf.LoadStream(stream))
-					{
-						Debug.LogError("Не вдалося завантажити модель!");
-						
-						continue;
-					}
+					Debug.LogError("Не вдалося завантажити модель!");
 
-					await gltf.InstantiateMainSceneAsync(gameObject.transform);
-					
-					gameObject.transform.position = Vector3.zero;
-					gameObject.SetActive(false);
-					
-					models.Add(gameObject);
+					continue;
 				}
+
+				await gltf.InstantiateSceneAsync(gameObject.transform);
+
+				gameObject.transform.position = Vector3.zero;
+				//gameObject.SetActive(false);
+
+				models.Add(gameObject);
 			}
 
 			return models;

@@ -172,19 +172,19 @@ public class ImageTrackingManager : MonoBehaviour
 			return;
 		}
 
-		///_logger.WriteLog($"Reference image name: {image.referenceImage.name}\nImage size: {image.referenceImage.size}");
+		//_logger.WriteLog($"Reference image name: {image.referenceImage.name}\nImage size: {image.referenceImage.size}");
 
-		//if (image.trackingState == TrackingState.Limited ||
-		//	image.trackingState == TrackingState.None)
-		//{
-		//	_arObjects[image.referenceImage.name].SetActive(false);
+		if (image.trackingState == TrackingState.Limited ||
+			image.trackingState == TrackingState.None)
+		{
+			_arObjects[image.referenceImage.name].SetActive(false);
 
-		//	return;
-		//}
+			return;
+		}
 
-		//_arObjects[image.referenceImage.name].SetActive(true);
-		//_arObjects[image.referenceImage.name].transform.position = image.transform.position;
-		//_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
+		_arObjects[image.referenceImage.name].SetActive(true);
+		_arObjects[image.referenceImage.name].transform.position = image.transform.position;
+		_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
 	}
 
 	/// <summary>
