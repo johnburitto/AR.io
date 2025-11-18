@@ -89,7 +89,7 @@ namespace Assets.Scripts.FileManagement.Implementations
 				await gltf.InstantiateSceneAsync(gameObject.transform);
 
 				gameObject.transform.position = Vector3.zero;
-				//gameObject.SetActive(false);
+				gameObject.SetActive(false);
 
 				models.Add(gameObject);
 			}
