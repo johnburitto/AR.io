@@ -3,6 +3,7 @@
 	"references": [
 		"glTFast",
 		"glTFast.Export",
-		"GLTFast.Materials"
+		"GLTFast.Materials",
+		"SFB"
 	]
 }

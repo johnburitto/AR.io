@@ -15,6 +15,15 @@ using ILogger = Assets.Scripts.Logger.Interfaces.ILogger;
 
 public class ImageTrackingManager : MonoBehaviour
 {
+	#region Serialized Fields
+
+	/// <summary>
+	/// Loaded Ar Packets UI manager.
+	/// </summary>
+	[SerializeField] LoadedArPacketsUIManager _loadedArPacketsUIManager;
+
+	#endregion
+
 	#region Private Fields
 
 	/// <summary>
@@ -49,7 +58,7 @@ public class ImageTrackingManager : MonoBehaviour
 	/// <summary>
 	/// Indexing of Ar objects by their names.
 	/// </summary>
-	/// <param name="name">Ar object name</param>
+	/// <param name="name">Ar object name.</param>
 	/// <returns>Ar object.</returns>
 	public GameObject this[string name] => _arObjects[name];
 	
@@ -80,6 +89,7 @@ public class ImageTrackingManager : MonoBehaviour
 			await LoadModelsAsync();
 		}
 
+		_loadedArPacketsUIManager.UpdateUIinfo(_arManager.referenceLibrary.count, _arObjects.Count);
 		_logger.WriteLog($"Images count: {_arManager.referenceLibrary.count}\n\n\nModel count:{_arObjects.Count}");
 	}
 
@@ -109,6 +119,7 @@ public class ImageTrackingManager : MonoBehaviour
 		await LoadMarkersAsync();
 		await LoadModelsAsync();
 
+		_loadedArPacketsUIManager.UpdateUIinfo(_arManager.referenceLibrary.count, _arObjects.Count);
 		_logger.WriteLog($"Images count after reload: {_arManager.referenceLibrary.count}\n\n\nModel count after reload:{_arObjects.Count}");
 	}
 

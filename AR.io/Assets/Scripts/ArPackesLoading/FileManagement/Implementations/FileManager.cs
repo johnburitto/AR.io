@@ -16,6 +16,10 @@ namespace Assets.Scripts.FileManagement.Implementations
 	/// </summary>
 	public class FileManager : IFileManager
 	{
+		#region Private Fields
+
+		#endregion
+
 		#region Public Properties
 
 #if UNITY_EDITOR

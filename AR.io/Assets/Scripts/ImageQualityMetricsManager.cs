@@ -1,9 +1,6 @@
 using System;
-using System.IO;
-using System.Linq;
 using System.Collections.Generic;
 
-using Assets.Scripts;
 using Assets.Scripts.Entities;
 
 using UnityEngine;
@@ -15,31 +12,32 @@ using QualityLevel = Assets.Scripts.Enums.QualityLevel;
 /// </summary>
 public class ImageQualityMetricsManager : MonoBehaviour
 {
-	#region Main Pipeline
+	#region Constants
 
-	private async void Start()
-	{
-		var filePathes = CompositionRoot.FileManager.GetElementsPathes($"John Buritto/Cars/Markers");
-		var markers = await CompositionRoot.FileManager.GetMarkers(filePathes);
-		
-		foreach (var marker in markers.Select((value, i) => new { i, value }))
+	/// <summary>
+	/// Sobel matrix for X axis.
+	/// </summary>
+	private readonly int[,] SOBEL_X = new int[3, 3]
 		{
-			var result = ScoreMarker(marker.value);
+			{ -1, 0, 1 },
+			{ -2, 0, 2 },
+			{ -1, 0, 1 }
+		};
 
-			Debug.Log($"Marker: {Path.GetFileNameWithoutExtension(filePathes[marker.i])}");
-			Debug.Log("Final score: " + result.FinalScore);
+	/// <summary>
+	/// Sobel matrix for Y axis.
+	/// </summary>
+	private readonly int[,] SOBEL_Y = new int[3, 3]
+		{
+			{ -1, -2, -1 },
+			{ 0, 0, 0 },
+			{ 1,  2, 1 }
+		};
 
-			Debug.Log($"Features: {result.FeatureCount} ({result.FeatureQuality})");
-			Debug.Log($"Corner: {result.MeanCornerResponse} ({result.CornerQuality})");
-			Debug.Log($"Spatial: {result.SpatialScore} ({result.SpatialQuality})");
-			Debug.Log($"Entropy: {result.Entropy} ({result.EntropyQuality})");
-			Debug.Log($"Variance: {result.Variance} ({result.VarianceQuality})");
-			Debug.Log($"Repetition: {result.RepetitionScore} ({result.RepetitionQuality})");
-			Debug.Log($"GlobalContrast: {result.GlobalContrast} ({result.GlobalContrastQuality})");
-			Debug.Log($"LocalContrast: {result.LocalContrast} ({result.LocalContrastQuality})");
-			Debug.Log($"Compression: {result.CompressionArtifacts} ({result.CompressionQuality})");
-		}
-	}
+	private readonly int[,] NEIGHBORS = new int[,]
+		{
+			{ 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }
+		};
 
 	#endregion
 
@@ -73,10 +71,11 @@ public class ImageQualityMetricsManager : MonoBehaviour
 		result.Entropy = entropy;
 		result.Variance = variance;
 
-		result.EntropyQuality = ThresholdDouble(entropy, 4.0, 5.5);
-		result.VarianceQuality = ThresholdDouble(variance, 0.01, 0.03);
+		result.EntropyQuality = Threshold(entropy, 4.0f, 5.5f);
+		result.VarianceQuality = Threshold(variance, 0.01f, 0.03f);
 
-		double repeat = ComputeRepetitionScore(texture);
+		var repeat = ComputeRepetitionScore(texture);
+		
 		result.RepetitionScore = repeat;
 
 		if (repeat <= 0.15)
@@ -137,41 +136,12 @@ public class ImageQualityMetricsManager : MonoBehaviour
 			0.05f * L_norm +
 			0.03f * A_pen;
 
-		result.FinalScore = Mathf.Clamp(score * 100f, 0f, 100f);
+		result.OverallScore = Mathf.Clamp(score * 100f, 0f, 100f);
 
 		return result;
 	}
 
 	#endregion
-
-	#region Constants
-
-	/// <summary>
-	/// Sobel matrix for X axis.
-	/// </summary>
-	private readonly int[,] SOBEL_X = new int[3, 3]
-		{
-			{ -1, 0, 1 },
-			{ -2, 0, 2 },
-			{ -1, 0, 1 }
-		};
-
-	/// <summary>
-	/// Sobel matrix for Y axis.
-	/// </summary>
-	private readonly int[,] SOBEL_Y = new int[3, 3]
-		{
-			{ -1, -2, -1 },
-			{ 0, 0, 0 },
-			{ 1,  2, 1 }
-		};
-
-	private readonly int[,] NEIGHBORS = new int[,]
-		{
-			{ 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }
-		};
-
-#endregion
 
 	#region Utility Methods
 
@@ -211,28 +181,6 @@ public class ImageQualityMetricsManager : MonoBehaviour
 	/// <param name="medium">Medium.</param>
 	/// <returns>Threshold.</returns>
 	private QualityLevel Threshold(float value, float bad, float medium)
-	{
-		if (value < bad)
-		{
-			return QualityLevel.Bad;
-		}
-
-		if (value < medium)
-		{
-			return QualityLevel.Medium;
-		}
-
-		return QualityLevel.Good;
-	}
-
-	/// <summary>
-	/// Computes quality level based on thresholds.
-	/// </summary>
-	/// <param name="value">Value.</param>
-	/// <param name="bad">Bad.</param>
-	/// <param name="medium">Medium.</param>
-	/// <returns>Threshold.</returns>
-	private QualityLevel ThresholdDouble(double value, double bad, double medium)
 	{
 		if (value < bad)
 		{
@@ -473,7 +421,7 @@ public class ImageQualityMetricsManager : MonoBehaviour
 	/// </summary>
 	/// <param name="texture">Texture.</param>
 	/// <returns>Entropy, variance.</returns>
-	private (double entropy, double variance) ComputeEntropyAndVariance(Texture2D texture)
+	private (float entropy, float variance) ComputeEntropyAndVariance(Texture2D texture)
 	{
 		var grayScaleMatrix = ToGrayScale(texture);
 		var width = grayScaleMatrix.GetLength(0);
@@ -481,8 +429,8 @@ public class ImageQualityMetricsManager : MonoBehaviour
 		var n = width * height;
 
 		var histogram = new int[256];
-		var sum = 0.0;
-		var sumSq = 0.0;
+		var sum = 0.0f;
+		var sumSq = 0.0f;
 
 		for (int y = 0; y < height; y++)
 		{
@@ -500,7 +448,7 @@ public class ImageQualityMetricsManager : MonoBehaviour
 		var mean = sum / n;
 		var variance = (sumSq / n) - (mean * mean);
 
-		var entropy = 0.0;
+		var entropy = 0.0f;
 
 		for (int i = 0; i < 256; i++)
 		{
@@ -509,9 +457,9 @@ public class ImageQualityMetricsManager : MonoBehaviour
 				continue;
 			}
 
-			var p = (double)histogram[i] / n;
+			var p = (float)histogram[i] / n;
 
-			entropy -= p * Math.Log(p, 2);
+			entropy -= p * Mathf.Log(p, 2);
 		}
 		
 		return (entropy, variance);

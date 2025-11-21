@@ -7,12 +7,12 @@ namespace Assets.Scripts.Entities
 	/// </summary>
 	public class MarkerQualityResult
 	{
-		#region Final Score
+		#region Overall Score
 
 		/// <summary>
-		/// Final score.
+		/// Overall score.
 		/// </summary>
-		public float FinalScore;
+		public float OverallScore;
 
 		#endregion
 
@@ -63,7 +63,7 @@ namespace Assets.Scripts.Entities
 		/// <summary>
 		/// Entropy.
 		/// </summary>
-		public double Entropy;
+		public float Entropy;
 
 		/// <summary>
 		/// Entropy quality.
@@ -77,7 +77,7 @@ namespace Assets.Scripts.Entities
 		/// <summary>
 		/// Variance.
 		/// </summary>
-		public double Variance;
+		public float Variance;
 
 		/// <summary>
 		/// Variance quality.
@@ -91,7 +91,7 @@ namespace Assets.Scripts.Entities
 		/// <summary>
 		/// Repetition score.
 		/// </summary>
-		public double RepetitionScore;
+		public float RepetitionScore;
 
 		/// <summary>
 		/// Repetition quality.
@@ -128,7 +128,7 @@ namespace Assets.Scripts.Entities
 
 		#endregion
 
-		#region Compression artifacts
+		#region Compression Artifacts
 
 		/// <summary>
 		/// Compression artifacts.

@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.DAL.Interfaces;
+﻿using Assets.Scripts.Resources;
+using Assets.Scripts.DAL.Interfaces;
 using Assets.Scripts.Logger.Interfaces;
 using Assets.Scripts.DAL.Implementations;
 using Assets.Scripts.FileManagement.Interfaces;
@@ -25,5 +26,10 @@ namespace Assets.Scripts
 		/// Ar Packets db manager.
 		/// </summary>
 		public static IArPacketsDbManager ArPacketsDbManager = new ArPacketsDbManager();
+
+		/// <summary>
+		/// Image evaluation info texts.
+		/// </summary>
+		public static ImageEvaluationInfoText ImageEvaluationInfoText = new();
 	}
 }

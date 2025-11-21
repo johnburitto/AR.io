@@ -21,6 +21,11 @@ public class ArPacketsListUIManager : MonoBehaviour
 	
 	[Header("UI Elements")]
 	/// <summary>
+	/// Header.
+	/// </summary>
+	[SerializeField] private RectTransform _header;
+
+	/// <summary>
 	/// Button for show the list.
 	/// </summary>
 	[SerializeField] private Button _listButton;
@@ -123,7 +128,7 @@ public class ArPacketsListUIManager : MonoBehaviour
 		ClearList();
 
 		_scrollView.SetActive(false);
-		_listButton.gameObject.SetActive(isShowListButton);
+		_header.gameObject.SetActive(isShowListButton);
 		_cancelButton.gameObject.SetActive(false);
 
 		EnableArComponents(true);
@@ -138,7 +143,7 @@ public class ArPacketsListUIManager : MonoBehaviour
 		await PopulateArPacketsList();
 
 		_scrollView.SetActive(true);
-		_listButton.gameObject.SetActive(false);
+		_header.gameObject.SetActive(false);
 		_cancelButton.gameObject.SetActive(true);
 	}
 

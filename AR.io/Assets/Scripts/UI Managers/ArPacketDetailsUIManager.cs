@@ -1,15 +1,17 @@
-using Assets.Scripts;
-using Assets.Scripts.Entities;
-using Assets.Scripts.FileManagement.Interfaces;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Assets.Scripts;
+using Assets.Scripts.Entities;
+using Assets.Scripts.FileManagement.Interfaces;
+
 using TMPro;
-using Unity.XR.CoreUtils;
+
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Timeline;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using Unity.XR.CoreUtils;
 using UnityEngine.XR.ARFoundation;
 
 /// <summary>
@@ -56,7 +58,7 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 	/// </summary>
 	[SerializeField] private GameObject _listItem;
 
-	[Header("UI Elements")]
+	[Header("UI Text Elements")]
 	/// <summary>
 	/// Ar Packet name.
 	/// </summary>
