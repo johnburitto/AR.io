@@ -1,13 +1,14 @@
-﻿using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-
-using Assets.Scripts;
+﻿using Assets.Scripts;
 using Assets.Scripts.DAL.Interfaces;
 using Assets.Scripts.FileManagement.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 using UnityEngine;
+using UnityEngine.Timeline;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
@@ -21,6 +22,11 @@ public class ImageTrackingManager : MonoBehaviour
 	/// Loaded Ar Packets UI manager.
 	/// </summary>
 	[SerializeField] LoadedArPacketsUIManager _loadedArPacketsUIManager;
+
+	/// <summary>
+	/// Load popup UI manager.
+	/// </summary>
+	[SerializeField] LoadPopupUIManager _loadPopupUIManager;
 
 	#endregion
 
@@ -141,12 +147,25 @@ public class ImageTrackingManager : MonoBehaviour
 				continue;
 			}
 
-			var models = await _fileManager.GetModels(arPacket.Author, arPacket.Name);
+			var modelTasks = _fileManager.GetModels(arPacket.Author, arPacket.Name);
+			var totalModels = modelTasks.Count;
+			var processedModels = 0;
 
-			foreach (var model in models)
+			await _loadPopupUIManager.RunProcess(async (process) =>
 			{
-				_arObjects.TryAdd(model.name, model);
-			}
+				foreach (var modelTask in modelTasks)
+				{
+					processedModels++;
+
+					var model = await modelTask();
+
+					_arObjects.TryAdd(model.name, model);
+
+					_loadPopupUIManager.SetPopupHeader($"Loading markers");
+					_loadPopupUIManager.SetPopupInfo($"Marker: {model.name}");
+					process.Report((float)processedModels / totalModels);
+				}
+			});
 		}
 	}
 
@@ -230,14 +249,25 @@ public class ImageTrackingManager : MonoBehaviour
 
 		var filePathes = _fileManager.GetElementsPathes(path);
 		var markers = await _fileManager.GetMarkers(filePathes);
+		var totalMarkers = markers.Count;
+		var processedMarkers = 0;
 
-		foreach (var marker in markers.Select((value, i) => new { i, value }))
+		await _loadPopupUIManager.RunProcess(async (process) =>
 		{
-			var job = runtimeLibrary.ScheduleAddImageWithValidationJob(marker.value, Path.GetFileNameWithoutExtension(filePathes[marker.i]), 0.1f);
+			foreach (var marker in markers.Select((value, i) => new { i, value }))
+			{
+				var job = runtimeLibrary.ScheduleAddImageWithValidationJob(marker.value, Path.GetFileNameWithoutExtension(filePathes[marker.i]), 0.1f);
 
-			job.jobHandle.Complete();
-		}
+				job.jobHandle.Complete();
 
+				processedMarkers++;
+
+				_loadPopupUIManager.SetPopupHeader($"Loading markers");
+				_loadPopupUIManager.SetPopupInfo($"Marker: {Path.GetFileNameWithoutExtension(filePathes[marker.i])}");
+				process.Report((float)processedMarkers / totalMarkers);
+			}
+		});
+		
 		_logger.WriteLog("Markers uploaded");
 	}
 

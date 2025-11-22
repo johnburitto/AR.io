@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -49,7 +50,7 @@ namespace Assets.Scripts.FileManagement.Interfaces
 		/// <param name="author">Author.</param>
 		/// <param name="packetName">Ar Packet name.</param>
 		/// <returns>List of Ar Packet models.</returns>
-		Task<List<GameObject>> GetModels(string author, string packetName);
+		List<Func<Task<GameObject>>> GetModels(string author, string packetName);
 
 		/// <summary>
 		/// Check if Ar Packet is downloaded.

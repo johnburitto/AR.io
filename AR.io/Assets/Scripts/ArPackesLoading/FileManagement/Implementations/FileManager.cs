@@ -1,12 +1,10 @@
-﻿using System.IO;
+﻿using Assets.Scripts.FileManagement.Interfaces;
+using GLTFast;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-
-using Assets.Scripts.FileManagement.Interfaces;
-
-using GLTFast;
-
 using UnityEngine;
 
 namespace Assets.Scripts.FileManagement.Implementations
@@ -16,10 +14,6 @@ namespace Assets.Scripts.FileManagement.Implementations
 	/// </summary>
 	public class FileManager : IFileManager
 	{
-		#region Private Fields
-
-		#endregion
-
 		#region Public Properties
 
 #if UNITY_EDITOR
@@ -72,30 +66,14 @@ namespace Assets.Scripts.FileManagement.Implementations
 			=> Directory.GetFiles($"{BasePath}/{path}").Where(path => !path.EndsWith(".meta")).ToList();
 
 		/// <inheritdoc/>
-		public async Task<List<GameObject>> GetModels(string author, string packetName)
+		public List<Func<Task<GameObject>>> GetModels(string author, string packetName)
 		{
-			var models = new List<GameObject>();
+			var models = new List<Func<Task<GameObject>>>();
 			var modelsPathes = GetElementsPathes($"{author}/{packetName}/Models");
 
 			foreach (var path in modelsPathes)
 			{
-				var modelName = Path.GetFileNameWithoutExtension(path);
-				var gameObject = new GameObject(modelName);
-				var gltf = new GltfImport();
-
-				if (!await gltf.LoadFile(path))
-				{
-					Debug.LogError("Не вдалося завантажити модель!");
-
-					continue;
-				}
-
-				await gltf.InstantiateSceneAsync(gameObject.transform);
-
-				gameObject.transform.position = Vector3.zero;
-				gameObject.SetActive(false);
-
-				models.Add(gameObject);
+				models.Add(async () => await LoadModelAsync(path));
 			}
 
 			return models;
@@ -104,6 +82,36 @@ namespace Assets.Scripts.FileManagement.Implementations
 		/// <inheritdoc/>
 		public bool IsArPacketDownloaded(string author, string packetName)
 			=> Directory.Exists($"{BasePath}/{author}/{packetName}");
+
+		#endregion
+
+		#region Private Methods
+
+		/// <summary>
+		/// Get model by path.
+		/// </summary>
+		/// <param name="path">Path.</param>
+		/// <returns>Model.</returns>
+		private async Task<GameObject> LoadModelAsync(string path)
+		{
+			var modelName = Path.GetFileNameWithoutExtension(path);
+			var gameObject = new GameObject(modelName);
+			var gltf = new GltfImport();
+
+			if (!await gltf.LoadFile(path))
+			{
+				Debug.LogError("Не вдалося завантажити модель!");
+
+				return null;
+			}
+
+			await gltf.InstantiateSceneAsync(gameObject.transform);
+
+			gameObject.transform.position = Vector3.zero;
+			gameObject.SetActive(false);
+
+			return gameObject;
+		}
 
 		#endregion
 	}
