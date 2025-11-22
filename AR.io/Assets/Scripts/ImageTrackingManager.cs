@@ -1,14 +1,13 @@
-﻿using Assets.Scripts;
-using Assets.Scripts.DAL.Interfaces;
-using Assets.Scripts.FileManagement.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+
+using Assets.Scripts;
+using Assets.Scripts.DAL.Interfaces;
+using Assets.Scripts.FileManagement.Interfaces;
 
 using UnityEngine;
-using UnityEngine.Timeline;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
@@ -161,8 +160,8 @@ public class ImageTrackingManager : MonoBehaviour
 
 					_arObjects.TryAdd(model.name, model);
 
-					_loadPopupUIManager.SetPopupHeader($"Loading markers");
-					_loadPopupUIManager.SetPopupInfo($"Marker: {model.name}");
+					_loadPopupUIManager.SetPopupHeader($"Loading models");
+					_loadPopupUIManager.SetPopupInfo($"Model: {model.name}");
 					process.Report((float)processedModels / totalModels);
 				}
 			});
@@ -214,7 +213,7 @@ public class ImageTrackingManager : MonoBehaviour
 
 		_arObjects[image.referenceImage.name].SetActive(true);
 		_arObjects[image.referenceImage.name].transform.position = image.transform.position;
-		_arObjects[image.referenceImage.name].transform.rotation = image.transform.rotation;
+		PlacedObjectHolder.PlacedObject = _arObjects[image.referenceImage.name];
 	}
 
 	/// <summary>
@@ -265,6 +264,11 @@ public class ImageTrackingManager : MonoBehaviour
 				_loadPopupUIManager.SetPopupHeader($"Loading markers");
 				_loadPopupUIManager.SetPopupInfo($"Marker: {Path.GetFileNameWithoutExtension(filePathes[marker.i])}");
 				process.Report((float)processedMarkers / totalMarkers);
+
+				if (processedMarkers != totalMarkers)
+				{
+					await Task.Delay(500);
+				}
 			}
 		});
 		

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 using Assets.Scripts;
@@ -9,7 +8,6 @@ using Assets.Scripts.LoadEntities;
 
 using Newtonsoft.Json;
 
-using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.XR.ARFoundation;
