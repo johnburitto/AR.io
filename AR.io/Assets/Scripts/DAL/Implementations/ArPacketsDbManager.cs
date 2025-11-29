@@ -65,7 +65,7 @@ namespace Assets.Scripts.DAL.Implementations
 		}
 
 		/// <inheritdoc/>
-		public void Delete(Guid id)
+		public int Delete(Guid id)
 			=> _db.Delete<ArPacket>(id);
 
 		/// <inheritdoc/>

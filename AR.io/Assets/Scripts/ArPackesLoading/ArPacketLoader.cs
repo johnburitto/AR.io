@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -90,7 +89,7 @@ public class ArPacketLoader : MonoBehaviour
 	/// <summary>
 	/// Downloads logo.
 	/// </summary>
-	/// <param name="logoUrl">Logo url.</param>
+	/// <param name="url">Logo url.</param>
 	/// <param name="author">Ar Packet author.</param>
 	/// <param name="packetName">Ar Packet name.</param>
 	private async Task DownloadLogo(string url, string author, string packetName)

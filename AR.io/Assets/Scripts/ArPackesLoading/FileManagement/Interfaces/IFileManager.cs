@@ -59,5 +59,12 @@ namespace Assets.Scripts.FileManagement.Interfaces
 		/// <param name="packetName">Ar Packet name.</param>
 		/// <returns>Whether Ar Packet is downloaded or not.</returns>
 		bool IsArPacketDownloaded(string author, string packetName);
+
+		/// <summary>
+		/// Delete Ar Packet from local storage.
+		/// </summary>
+		/// <param name="author">Author.</param>
+		/// <param name="packetName">Ar Packet name.</param>
+		void DeletArPacket(string author, string packetName);
 	}
 }

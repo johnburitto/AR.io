@@ -86,6 +86,15 @@ namespace Assets.Scripts.FileManagement.Implementations
 		public bool IsArPacketDownloaded(string author, string packetName)
 			=> Directory.Exists($"{BasePath}/{author}/{packetName}");
 
+		/// <inheritdoc/>
+		public void DeletArPacket(string author, string packetName)
+		{
+			if (IsArPacketDownloaded(author, packetName))
+			{
+				Directory.Delete($"{BasePath}/{author}/{packetName}", true);
+			}
+		}
+
 		#endregion
 
 		#region Private Methods

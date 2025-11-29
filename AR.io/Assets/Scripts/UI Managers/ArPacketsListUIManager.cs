@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Assets.Scripts;
 using Assets.Scripts.Entities;
@@ -10,6 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.XR.CoreUtils;
+using UnityEngine.Events;
 using UnityEngine.XR.ARFoundation;
 
 /// <summary>
@@ -71,6 +73,12 @@ public class ArPacketsListUIManager : MonoBehaviour
 	/// </summary>
 	[SerializeField] private ArPacketLoader _arPacketLoader;
 
+	[Header("Sprites")]
+	/// <summary>
+	/// Ar tracked image manager.
+	/// </summary>
+	[SerializeField] private List<Sprite> _toogleSprites;
+
 	[Header("UI Managers")]
 	/// <summary>
 	/// Ar tracked image manager.
@@ -95,6 +103,11 @@ public class ArPacketsListUIManager : MonoBehaviour
 	/// File manager.
 	/// </summary>
 	private IFileManager _fileManager;
+
+	/// <summary>
+	/// On close event.
+	/// </summary>
+	private UnityAction _onCloseEvent;
 
 	#endregion
 
@@ -123,7 +136,7 @@ public class ArPacketsListUIManager : MonoBehaviour
 	/// Close Ar Packets list.
 	/// </summary>
 	/// <param name="isShowListButton">Indicates whether open or close list button.</param>
-	public void HideList(bool isShowListButton = true)
+	public void HideList(bool isShowListButton = true, bool isDetails = false)
 	{
 		ClearList();
 
@@ -132,6 +145,11 @@ public class ArPacketsListUIManager : MonoBehaviour
 		_cancelButton.gameObject.SetActive(false);
 
 		EnableArComponents(true);
+
+		if (!isDetails)
+		{
+			_onCloseEvent?.Invoke();
+		}
 	}
 
 	/// <summary>
@@ -156,22 +174,30 @@ public class ArPacketsListUIManager : MonoBehaviour
 	/// </summary>
 	private async Task PopulateArPacketsList()
 	{
-		var arPackets = _arPacketsDbManager.GetEnabledArPackets();
+		var arPackets = _arPacketsDbManager.GetAll();
 
 		foreach (var arPacket in arPackets)
 		{
 			var listItemInstance = Instantiate(_listItem, _contentContainer);
 			var logoTexture = await _fileManager.GetLogo($"{_fileManager.BasePath}/{arPacket.Author}/{arPacket.Name}/logo.png");
 			var button = listItemInstance.GetComponent<Button>();
+			var deleteButton = listItemInstance.GetNamedChild("Delete Button").GetComponent<Button>();
+			var enableButton = listItemInstance.GetNamedChild("Enable Button").GetComponent<Button>();
 
 			listItemInstance.GetComponentInChildren<RawImage>().texture = logoTexture;
-			listItemInstance.GetNamedChild("Ar Packet Name")
-				.GetComponent<TMP_Text>().text = $"{arPacket.Name} by {arPacket.Author}";
-			listItemInstance.GetNamedChild("Ar Packet Version")
-				.GetComponent<TMP_Text>().text = $"v{arPacket.Version}";
-			
+			listItemInstance.GetNamedChild("Ar Packet Info")
+				.GetComponent<TMP_Text>().text = $"{arPacket.Name} by {arPacket.Author} [v{arPacket.Version}]";
+			enableButton.GetComponent<Image>().sprite = arPacket.IsEnabled ? _toogleSprites[0] : _toogleSprites[1];
+			enableButton.GetComponent<Image>().color = arPacket.IsEnabled ? Color.green : Color.black;
+
 			button.onClick.RemoveAllListeners();
 			button.onClick.AddListener(async () => await OpeDetails(arPacket));
+
+			deleteButton.onClick.RemoveAllListeners();
+			deleteButton.onClick.AddListener(async () => await DeleteArPacket(arPacket));
+
+			enableButton.onClick.RemoveAllListeners();
+			enableButton.onClick.AddListener(() => DisableArPacket(arPacket, enableButton));
 		}
 	}
 
@@ -209,6 +235,48 @@ public class ArPacketsListUIManager : MonoBehaviour
 		_arPacketDetailsUIManager.InitDetails(arPacket);
 		_arPacketDetailsUIManager.SetMarkersButtonOnClick(async () => await _arPacketDetailsUIManager.LoadMarkers($"{arPacket.Author}/{arPacket.Name}/Markers"));
 		await _arPacketDetailsUIManager.ShowDetails();
+	}
+
+	/// <summary>
+	/// Delete Ar Packet.
+	/// </summary>
+	/// <param name="arPacket">Ar Packet.</param>
+	private async Task DeleteArPacket(ArPacket arPacket)
+	{
+		var result = _arPacketsDbManager.Delete(arPacket.Id);
+		
+		_fileManager.DeletArPacket(arPacket.Author, arPacket.Name);
+
+		if (result != 0)
+		{
+			_onCloseEvent = null;
+			_onCloseEvent = async () => await _imageTrackingManager.ReloadArPackets();
+		}
+
+		ClearList();
+		await PopulateArPacketsList();
+	}
+
+	/// <summary>
+	/// Disable Ar Packet.
+	/// </summary>
+	/// <param name="arPacket">Ar Packet.</param>
+	private void DisableArPacket(ArPacket arPacket, Button enableButton)
+	{
+		var icon = arPacket.IsEnabled ? _toogleSprites[1] : _toogleSprites[0];
+
+		arPacket.IsEnabled = !arPacket.IsEnabled;
+
+		var result = _arPacketsDbManager.Update(arPacket);
+
+		if (result != 0)
+		{
+			_onCloseEvent = null;
+			_onCloseEvent = async () => await _imageTrackingManager.ReloadArPackets();
+		}
+
+		enableButton.GetComponent<Image>().sprite = icon;
+		enableButton.GetComponent<Image>().color = arPacket.IsEnabled ? Color.green : Color.black;
 	}
 
 	#endregion

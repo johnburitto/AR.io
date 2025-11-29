@@ -39,6 +39,7 @@ namespace Assets.Scripts.DAL.Interfaces
 		/// Delete entity from db.
 		/// </summary>
 		/// <param name="id">Entity id.</param>
-		void Delete(Guid id);
+		/// <returns>Number of deleted rows.</returns>
+		int Delete(Guid id);
 	}
 }

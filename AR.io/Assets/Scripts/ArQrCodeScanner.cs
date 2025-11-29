@@ -2,9 +2,10 @@ using System;
 using System.Threading.Tasks;
 
 using Assets.Scripts;
-using Assets.Scripts.DAL.Interfaces;
 using Assets.Scripts.Entities;
 using Assets.Scripts.LoadEntities;
+using Assets.Scripts.DAL.Interfaces;
+using Assets.Scripts.FileManagement.Interfaces;
 
 using Newtonsoft.Json;
 
@@ -71,6 +72,11 @@ public class ArQrCodeScanner : MonoBehaviour
 	private IArPacketsDbManager _arPacketsDbManager;
 
 	/// <summary>
+	/// File manager.
+	/// </summary>
+	private IFileManager _fileManager;
+
+	/// <summary>
 	/// Logger.
 	/// </summary>
 	private ILogger _logger;
@@ -99,6 +105,7 @@ public class ArQrCodeScanner : MonoBehaviour
 			}
 		};
 		_arPacketsDbManager = CompositionRoot.ArPacketsDbManager;
+		_fileManager = CompositionRoot.FileManager;
 		_uiManager.SetDeclineButtonOnClick(HideUI);
 
 		_logger.WriteLog("ArQrCodeScanner end Start");
@@ -244,6 +251,7 @@ public class ArQrCodeScanner : MonoBehaviour
 
 		HideUI();
 
+		_fileManager.DeletArPacket(arPacketSource.Author, arPacketSource.Name);
 		await _arPacketsLoader.ProcessArPacketSource(arPacketSource);
 		_arPacketsDbManager.CreateUpdateArPacket(new ArPacket
 		{

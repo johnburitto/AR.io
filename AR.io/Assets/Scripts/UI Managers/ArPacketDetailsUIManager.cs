@@ -162,7 +162,7 @@ public class ArPacketDetailsUIManager : MonoBehaviour
 	/// <returns></returns>
 	public async Task ShowDetails()
 	{
-		_arPacketListUIManager.HideList(false);
+		_arPacketListUIManager.HideList(false, true);
 
 		EnableArComponents(false);
 		await PopulateHeaderData();
