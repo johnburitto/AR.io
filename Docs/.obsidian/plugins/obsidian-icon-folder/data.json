@@ -6,6 +6,7 @@
     "emojiStyle": "native",
     "iconColor": null,
     "recentlyUsedIcons": [
+      "LiImage",
       "OcWorkflow24",
       "RaGears"
     ],
@@ -32,5 +33,6 @@
     "useInternalPlugins": false
   },
   "Ютілки": "RaGears",
-  "Основний workflow": "OcWorkflow24"
+  "Основний workflow": "OcWorkflow24",
+  "Фото": "LiImage"
 }

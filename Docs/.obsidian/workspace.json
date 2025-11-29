@@ -4,19 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "94b85c73b89b4987",
+        "id": "9a8a908f851351e4",
         "type": "tabs",
         "children": [
           {
-            "id": "24da40e42c14fa6d",
+            "id": "d44b707d4ed7eb89",
             "type": "leaf",
             "state": {
               "type": "excalidraw",
               "state": {
-                "file": "Excalidraw/Workflow.md"
+                "file": "Excalidraw/Architecture.md"
               },
               "icon": "excalidraw-icon",
-              "title": "Workflow"
+              "title": "Architecture"
             }
           }
         ]
@@ -43,7 +43,7 @@
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
-              "title": "Файловий менеджер"
+              "title": "Files"
             }
           },
           {
@@ -87,7 +87,7 @@
               "type": "graph",
               "state": {},
               "icon": "lucide-git-fork",
-              "title": "Граф"
+              "title": "Graph view"
             }
           }
         ]
@@ -202,13 +202,13 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
       "bases:Create new base": false,
-      "switcher:Відкрити провідник файлів": false,
-      "canvas:Створити нове полотно": false,
-      "daily-notes:Сьогоднішня нотатка": false,
-      "templates:Вставити шаблон": false,
-      "graph:Граф": false,
-      "command-palette:Відкрити меню команд": false,
       "omnisearch:Omnisearch": false,
       "ace-code-editor:Open CSS snippet manager": false,
       "obsidian-kanban:Create new board": false,
@@ -216,14 +216,25 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "24da40e42c14fa6d",
+  "active": "d44b707d4ed7eb89",
   "lastOpenFiles": [
-    "Основний workflow/Завантаження AR-пакетів.md",
+    "Pasted Image 20251125221733_314.png",
     "Excalidraw/Workflow.md",
+    "Excalidraw/Architecture.md",
+    "Фото/Pasted Image 20251125220112_342.png",
+    "Pasted Image 20251125215926_204.png",
+    "Фото/Pasted Image 20251125213355_635.png",
+    "Фото/Pasted Image 20251125212443_342.png",
+    "Ютілки/Логер.md",
+    "Фото/Pasted Image 20251125213303_453.png",
+    "Фото/Pasted Image 20251125211326_814.png",
+    "Фото",
+    "Фото/Pasted Image 20251125211623_687.png",
+    "Фото/Pasted Image 20251125211429_444.png",
+    "Основний workflow/Завантаження AR-пакетів.md",
     "Основний workflow/DbManager.md",
     "sqlite-net-pcl.md",
     "Основний workflow/AR-пакет.md",
-    "Ютілки/Логер.md",
     "Основний workflow",
     "Без назви.md",
     "Ютілки",
