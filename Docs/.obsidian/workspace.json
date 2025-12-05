@@ -18,8 +18,21 @@
               "icon": "excalidraw-icon",
               "title": "Architecture"
             }
+          },
+          {
+            "id": "70c83614d577c1fa",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Excalidraw/Diagrams.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "Diagrams"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -216,11 +229,13 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "d44b707d4ed7eb89",
+  "active": "70c83614d577c1fa",
   "lastOpenFiles": [
-    "Pasted Image 20251125221733_314.png",
-    "Excalidraw/Workflow.md",
     "Excalidraw/Architecture.md",
+    "Excalidraw/Diagrams.md",
+    "Фото/Pasted Image 20251125211623_687.png",
+    "Excalidraw/Workflow.md",
+    "Фото/Pasted Image 20251125221733_314.png",
     "Фото/Pasted Image 20251125220112_342.png",
     "Pasted Image 20251125215926_204.png",
     "Фото/Pasted Image 20251125213355_635.png",
@@ -229,7 +244,6 @@
     "Фото/Pasted Image 20251125213303_453.png",
     "Фото/Pasted Image 20251125211326_814.png",
     "Фото",
-    "Фото/Pasted Image 20251125211623_687.png",
     "Фото/Pasted Image 20251125211429_444.png",
     "Основний workflow/Завантаження AR-пакетів.md",
     "Основний workflow/DbManager.md",
@@ -248,7 +262,6 @@
     "Excalidraw/Drawing 2025-08-06 00.36.13.excalidraw.md",
     "Excalidraw/Drawing 2025-08-06 00.35.36.excalidraw.md",
     "Test.md",
-    "images.png",
     "Tests.md",
     "Test/Test.md",
     "Test",
